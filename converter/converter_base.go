@@ -19,7 +19,6 @@ type Task func() interface{}
 type ConverterBase struct {
 	debug      bool
 	typ        ConverterType
-	path       Path
 	relPath    string
 	excelMap   map[string]map[string]Domain
 	contentMap map[string]string
@@ -29,7 +28,6 @@ func NewConverterBase(typ ConverterType) *ConverterBase {
 	return &ConverterBase{
 		debug:      false,
 		typ:        typ,
-		path:       path,
 		excelMap:   make(map[string]map[string]Domain),
 		contentMap: make(map[string]string),
 	}
@@ -100,7 +98,7 @@ func (c *ConverterBase) Load() {
 }
 
 func (c *ConverterBase) Scan() {
-	if err := filepath.Walk(c.path.ImportAbsPath(), func(absPath string, info fs.FileInfo, err error) error {
+	if err := filepath.Walk(path.ImportAbsPath(), func(absPath string, info fs.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -114,7 +112,7 @@ func (c *ConverterBase) Scan() {
 		if filepath.Ext(fileName) != FlagExt {
 			return nil
 		}
-		relPath := c.path.Rel(absPath)
+		relPath := path.Rel(absPath)
 		excelType := c.ExcelType(relPath)
 		var fieldType FieldType
 		switch c.typ {
@@ -125,7 +123,7 @@ func (c *ConverterBase) Scan() {
 		default:
 			Exit("[Main] Unsupported converter type %s", c.typ)
 		}
-		excel := excelCreators[excelType](c.path, relPath, fieldType)
+		excel := excelCreators[excelType](path, relPath, fieldType)
 		packageName := excel.PackageName()
 		if _, ok := c.excelMap[packageName]; !ok {
 			c.excelMap[packageName] = make(map[string]Domain)
@@ -280,7 +278,7 @@ func (c *ConverterBase) SetRelPath(relPath string) {
 }
 
 func (c *ConverterBase) Remove() {
-	absPath := c.path.Abs(c.relPath)
+	absPath := path.Abs(c.relPath)
 	err := os.RemoveAll(absPath)
 	if err != nil {
 		Exit("[Main] Remove error, %v", err)
