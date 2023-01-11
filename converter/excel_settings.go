@@ -50,11 +50,11 @@ func (*ExcelSettings) Type() ExcelType {
 
 func (e *ExcelSettings) parseStructure(sheet Sheet) StructureType {
 	switch sheet.Name() {
-	case SheetNameLucky:
+	case FlagVarian:
 		return StructureTypeStructs
-	case SheetNameLink:
+	case FlagLink:
 		return StructureTypeRows
-	case SheetNameCategory:
+	case FlagGroup:
 		return StructureTypeCols
 	default:
 		Exit("[%v] Unsupported structure for settings name %s", e, sheet.Name())

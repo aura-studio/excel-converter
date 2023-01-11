@@ -9,12 +9,6 @@ const (
 	SheetTypeSettings SheetType = "settings"
 )
 
-const (
-	SheetNameCategory = "Category"
-	SheetNameLucky    = "Lucky"
-	SheetNameLink     = "Link"
-)
-
 type Sheet interface {
 	String() string
 	Excel() Excel

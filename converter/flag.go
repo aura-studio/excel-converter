@@ -1,6 +1,6 @@
 package converter
 
-const (
+var (
 	FlagExt        = ".xlsx"
 	FlagSettings   = "Settings"
 	FlagTemplate   = "Template"
@@ -17,4 +17,7 @@ const (
 	FlagComma      = ","
 	FlagDash       = "-"
 	FlagSlash      = "/"
+	FlagGroup      = "Group"
+	FlagVarian     = "Varian"
+	FlagLink       = "Link"
 )

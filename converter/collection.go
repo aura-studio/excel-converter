@@ -116,7 +116,7 @@ func (l *Collection) ReadNode(node Node) {
 
 func (l *Collection) ReadLink(sheet Sheet) {
 	switch sheet.Name() {
-	case SheetNameLink:
+	case FlagLink:
 		for index := 0; index < sheet.VerticleSize(); index++ {
 			srcExcelName := sheet.GetCell(sheet.GetHeaderField(format.ToUpper(CollectionHeaderSrcExcel)), index)
 			dstExcelName := sheet.GetCell(sheet.GetHeaderField(format.ToUpper(CollectionHeaderDstExcel)), index)
@@ -128,7 +128,7 @@ func (l *Collection) ReadLink(sheet Sheet) {
 
 			l.linkMap[dstLinkPath] = srcLinkPath
 		}
-	case SheetNameLucky:
+	case FlagVarian:
 		for horizonIndex := 1; horizonIndex < sheet.HeaderSize(); horizonIndex++ {
 			for verticleIndex := 1; verticleIndex < sheet.VerticleSize(); verticleIndex++ {
 				srcExcelName := sheet.GetHeaderField(horizonIndex).Name
@@ -142,7 +142,7 @@ func (l *Collection) ReadLink(sheet Sheet) {
 				l.linkMap[dstLinkPath] = srcLinkPath
 			}
 		}
-	case SheetNameCategory:
+	case FlagGroup:
 		l.categories = append(l.categories, FlagBase)
 		branches := sheet.GetHorizon(0)
 		groups := sheet.GetHorizon(1)
