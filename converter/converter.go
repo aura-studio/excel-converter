@@ -12,15 +12,30 @@ type Converter interface {
 	Run()
 }
 
-var converterCreators map[ConverterType]func(Path) Converter
+var converterCreators map[ConverterType]func() Converter
 
 func init() {
-	converterCreators = map[ConverterType]func(Path) Converter{
-		ConverterTypeGo: func(path Path) Converter {
-			return NewConverterGo(path)
+	converterCreators = map[ConverterType]func() Converter{
+		ConverterTypeGo: func() Converter {
+			return NewConverterGo()
 		},
-		ConverterTypeLua: func(path Path) Converter {
-			return NewConverterLua(path)
+		ConverterTypeLua: func() Converter {
+			return NewConverterLua()
 		},
+	}
+}
+
+type Config struct {
+	Type       string
+	ImportPath string
+	ExportPath string
+}
+
+func Run(c Config) {
+	if converterCreator, ok := converterCreators[ConverterType(c.Type)]; !ok {
+		Exit("[Main] Converter %s is not supported", c.Type)
+	} else {
+		path.Init(c.ImportPath, c.ExportPath)
+		converterCreator().Run()
 	}
 }

@@ -7,7 +7,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"rocket-nano/internal/util/convert"
 	"sort"
 	"strings"
 	"sync"
@@ -26,7 +25,7 @@ type ConverterBase struct {
 	contentMap map[string]string
 }
 
-func NewConverterBase(path Path, typ ConverterType) *ConverterBase {
+func NewConverterBase(typ ConverterType) *ConverterBase {
 	return &ConverterBase{
 		debug:      false,
 		typ:        typ,
@@ -101,7 +100,7 @@ func (c *ConverterBase) Load() {
 }
 
 func (c *ConverterBase) Scan() {
-	if err := filepath.Walk(c.path.Abs(RelPathExcel), func(absPath string, info fs.FileInfo, err error) error {
+	if err := filepath.Walk(c.path.ImportAbsPath(), func(absPath string, info fs.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -178,7 +177,7 @@ func (c *ConverterBase) Read() {
 	c.ForeachExcel(func(excel Excel) {
 		excels = append(excels, excel)
 	})
-	c.Parallel(convert.ToSlice(excels), func(param interface{}) func() interface{} {
+	c.Parallel(ToSlice(excels), func(param interface{}) func() interface{} {
 		return func() interface{} {
 			excel := param.(Excel)
 			excel.Read()
@@ -247,7 +246,7 @@ func (c *ConverterBase) Preprocess() {
 	c.ForeachExcel(func(excel Excel) {
 		excels = append(excels, excel)
 	})
-	c.Parallel(convert.ToSlice(excels), func(param interface{}) func() interface{} {
+	c.Parallel(ToSlice(excels), func(param interface{}) func() interface{} {
 		return func() interface{} {
 			excel := param.(Excel)
 			excel.Preprocess()
@@ -267,7 +266,7 @@ func (c *ConverterBase) Build() {
 			excels = append(excels, excel)
 		}
 	})
-	c.Parallel(convert.ToSlice(excels), func(param interface{}) func() interface{} {
+	c.Parallel(ToSlice(excels), func(param interface{}) func() interface{} {
 		return func() interface{} {
 			excel := param.(Excel)
 			excel.Build()

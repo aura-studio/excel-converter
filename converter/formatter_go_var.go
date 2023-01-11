@@ -2,6 +2,7 @@ package converter
 
 import (
 	"fmt"
+	"path/filepath"
 )
 
 type FormatterGoVar struct {
@@ -20,10 +21,10 @@ func NewFormatterGoVar(packageName string, identifier *Identifier) *FormatterGoV
 	f.WriteString(fmt.Sprintf(`// <important: auto generate by excel-to-go converter, do not modify>
 package %s
 
-import "rocket-nano/internal/exported/config/structs"
+import "%s/structs"
 
 var (
-`, packageName))
+`, path.Dirname()+"/"+filepath.ToSlash(path.relExportPath), packageName))
 	f.IncDepth()
 	return f
 }

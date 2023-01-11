@@ -2,11 +2,12 @@ package converter
 
 import (
 	"fmt"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/360EntSecGroup-Skylar/excelize/v2"
+	"github.com/xuri/excelize/v2"
 )
 
 type FormatterGoData struct {
@@ -29,10 +30,10 @@ func NewFormatterGoData(packageName string, identifier *Identifier) *FormatterGo
 // <important: auto generate by excel-to-go converter, do not modify>
 package %s
 
-import "rocket-nano/internal/exported/config/structs"
+import "%s/structs"
 
 func init() {
-`, packageName))
+`, path.Dirname()+"/"+filepath.ToSlash(path.relExportPath), packageName))
 	f.IncDepth()
 	return f
 }

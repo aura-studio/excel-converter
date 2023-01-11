@@ -1,5 +1,7 @@
 package converter
 
+import "path/filepath"
+
 type FormatterGoStorage struct {
 	*FormatterBase
 	exelMap map[string]map[string]bool
@@ -87,7 +89,8 @@ func (f *FormatterGoStorage) FormatPackage(packageNames []string) {
 	f.WriteString("import (\n")
 	f.WriteString("\t\"encoding/json\"\n")
 	for _, packageName := range packageNames {
-		f.WriteString("\t\"rocket-nano/internal/exported/config/")
+		f.WriteString("\t\"")
+		f.WriteString(path.Dirname() + "/" + filepath.ToSlash(path.relExportPath) + "/")
 		goPackageName := format.ToGoPackageCase(packageName)
 		f.WriteString(goPackageName)
 		f.WriteString("\"\n")

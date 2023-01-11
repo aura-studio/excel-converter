@@ -3,68 +3,74 @@ package converter
 import (
 	"os"
 	"path/filepath"
-	"rocket-nano/internal/util/system"
-)
-
-const (
-	RelPathExcel    = "excel"
-	RelPathExternal = "external"
-	RelPathGo       = "../internal/exported/config"
-	RelPathLua      = "Client_Config/Config"
 )
 
 type Path interface {
+	Path() string
 	Abs(relPath string) string
-	Rel(absPath string) string
+	Rel(path string) string
+	ImportAbsPath() string
+	ImportRelPath() string
+	ExportAbsPath() string
+	ExportRelPath() string
 }
 
-type PathExternal struct {
-	root string
+type RootPath struct {
+	root          string
+	relImportPath string
+	relExportPath string
 }
 
-func NewPathExternal() *PathExternal {
-	p := &PathExternal{}
+var path = NewRootPath()
+
+func NewRootPath() *RootPath {
+	return &RootPath{}
+}
+
+func (p *RootPath) Init(relImportPath, relExportPath string) {
 	p.root = p.findRoot()
-	return p
+	p.relImportPath = relImportPath
+	p.relExportPath = relExportPath
 }
 
-func (p *PathExternal) findRoot() string {
+func (p *RootPath) Dirname() string {
+	return filepath.Base(p.root)
+}
+
+func (p *RootPath) Path() string {
+	return p.root
+}
+
+func (p *RootPath) ImportAbsPath() string {
+	return p.Abs(p.relImportPath)
+}
+
+func (p *RootPath) ImportRelPath() string {
+	return p.relImportPath
+}
+
+func (p *RootPath) ExportAbsPath() string {
+	return p.Abs(p.relExportPath)
+}
+
+func (p *RootPath) ExportRelPath() string {
+	return p.relExportPath
+}
+
+func (p *RootPath) findRoot() string {
 	cwd, err := os.Getwd()
 	if err != nil {
 		Exit("[Main] find root error, %v", err)
 	}
 
-	possibleRoots := []string{
-		cwd,
-		filepath.Join(p.findProjectDirectory(), RelPathExternal),
-	}
-
-	for _, root := range possibleRoots {
-		if system.Exists(filepath.Join(root, RelPathExcel)) {
-			return root
-		}
-	}
-	Exit("[Main] Root path not found, possible roots: %v", possibleRoots)
-	return ""
+	return cwd
 }
 
-func (*PathExternal) findProjectDirectory() string {
-	workingDirectory, err := os.Getwd()
-	if err != nil {
-		Exit("[Main] get cwd error: %v", err)
-	}
-	projectDirectory, err := system.MatchParentDir(workingDirectory, "rocket-nano")
-	if err != nil {
-		return workingDirectory
-	}
-	return projectDirectory
-}
-
-func (p *PathExternal) Abs(relPath string) string {
+func (p *RootPath) Abs(relPath string) string {
 	return filepath.Join(p.root, relPath)
 }
 
-func (p *PathExternal) Rel(path string) string {
+func (p *RootPath) Rel(path string) string {
 	relPath, err := filepath.Rel(p.root, path)
 	if err != nil {
 		Exit("[Main] Get rel file path error %v", path)

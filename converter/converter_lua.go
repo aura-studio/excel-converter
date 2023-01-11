@@ -3,18 +3,17 @@ package converter
 import (
 	"fmt"
 	"path/filepath"
-	"rocket-nano/internal/util/convert"
 )
 
 type ConverterLua struct {
 	*ConverterBase
 }
 
-func NewConverterLua(path Path) *ConverterLua {
+func NewConverterLua() *ConverterLua {
 	c := &ConverterLua{
-		ConverterBase: NewConverterBase(path, ConverterTypeLua),
+		ConverterBase: NewConverterBase(ConverterTypeLua),
 	}
-	c.SetRelPath(RelPathLua)
+	c.SetRelPath(path.ExportRelPath())
 	return c
 }
 
@@ -39,7 +38,7 @@ func (c *ConverterLua) Format() {
 	c.ForeachDomain(func(domain Domain) {
 		domains = append(domains, domain)
 	})
-	results := c.Parallel(convert.ToSlice(domains), func(param interface{}) func() interface{} {
+	results := c.Parallel(ToSlice(domains), func(param interface{}) func() interface{} {
 		return func() interface{} {
 			domain := param.(Domain)
 			formatter := NewFormatterLua()

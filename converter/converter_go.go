@@ -3,7 +3,6 @@ package converter
 import (
 	"fmt"
 	"path/filepath"
-	"rocket-nano/internal/util/convert"
 	"sort"
 )
 
@@ -13,13 +12,13 @@ type ConverterGo struct {
 	collection *Collection
 }
 
-func NewConverterGo(path Path) *ConverterGo {
+func NewConverterGo() *ConverterGo {
 	c := &ConverterGo{
-		ConverterBase: NewConverterBase(path, ConverterTypeGo),
+		ConverterBase: NewConverterBase(ConverterTypeGo),
 		identifier:    NewIdentifier(),
 		collection:    NewCollection(),
 	}
-	c.SetRelPath(RelPathGo)
+	c.SetRelPath(path.ExportRelPath())
 	return c
 }
 
@@ -154,7 +153,7 @@ func (c *ConverterGo) FormatData() {
 	c.ForeachDomain(func(domain Domain) {
 		domains = append(domains, domain)
 	})
-	results := c.Parallel(convert.ToSlice(domains), func(param interface{}) func() interface{} {
+	results := c.Parallel(ToSlice(domains), func(param interface{}) func() interface{} {
 		return func() interface{} {
 			domain := param.(Domain)
 			formatter := NewFormatterGoData(c.GetPackageName(domain), c.identifier)
@@ -187,7 +186,7 @@ func (c *ConverterGo) FormatVar() {
 	for packageName := range c.excelMap {
 		packageNames = append(packageNames, packageName)
 	}
-	results := c.Parallel(convert.ToSlice(packageNames), func(param interface{}) func() interface{} {
+	results := c.Parallel(ToSlice(packageNames), func(param interface{}) func() interface{} {
 		return func() interface{} {
 			packageName := param.(string)
 			formatter := NewFormatterGoVar(format.ToGoPackageCase(packageName), c.identifier)
