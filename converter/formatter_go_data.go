@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/xuri/excelize/v2"
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 )
 
 type FormatterGoData struct {

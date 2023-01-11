@@ -1,6 +1,3 @@
-if not exist "scripts" (cd ..)
-if not exist "scripts" (cd ..)
-if not exist "scripts" (cd ..)
 docker run --rm ^
 -v %cd%:/go/src/github.com/aura-studio/excel-converter ^
 -w /go/src/github.com/aura-studio/excel-converter ^
