@@ -2,10 +2,6 @@ package converter
 
 var (
 	FlagExt        = ".xlsx"
-	FlagSettings   = "Settings"
-	FlagTemplate   = "Template"
-	FlagDefault    = "Default"
-	FlagBase       = "Base"
 	FlagNil        = "nil"
 	FlagComment    = "#"
 	FlagFalse      = "false"
@@ -17,7 +13,11 @@ var (
 	FlagComma      = ","
 	FlagDash       = "-"
 	FlagSlash      = "/"
-	FlagCategory   = "Category"
-	FlagVarian     = "Varian"
-	FlagLink       = "Link"
+	FlagSettings   = "__Settings"
+	FlagTemplate   = "__Template"
+	FlagDefault    = "__Default"
+	FlagBase       = "__Base"
+	FlagCategory   = "__Category"
+	FlagVarian     = "__Varian"
+	FlagLink       = "__Link"
 )
