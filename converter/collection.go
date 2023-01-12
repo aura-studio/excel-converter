@@ -142,7 +142,7 @@ func (l *Collection) ReadLink(sheet Sheet) {
 				l.linkMap[dstLinkPath] = srcLinkPath
 			}
 		}
-	case FlagGroup:
+	case FlagCategory:
 		l.categories = append(l.categories, FlagBase)
 		branches := sheet.GetHorizon(0)
 		groups := sheet.GetHorizon(1)
@@ -150,6 +150,7 @@ func (l *Collection) ReadLink(sheet Sheet) {
 			l.categories = append(l.categories, branch)
 			for _, group := range groups {
 				category := fmt.Sprintf("%s_%s", format.ToUpper(branch), format.ToUpper(group))
+				Debug("[%s] category found, branch: %s, group: %s", category, branch, group)
 				l.categories = append(l.categories, category)
 			}
 		}

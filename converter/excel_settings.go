@@ -54,7 +54,7 @@ func (e *ExcelSettings) parseStructure(sheet Sheet) StructureType {
 		return StructureTypeStructs
 	case FlagLink:
 		return StructureTypeRows
-	case FlagGroup:
+	case FlagCategory:
 		return StructureTypeCols
 	default:
 		Exit("[%v] Unsupported structure for settings name %s", e, sheet.Name())

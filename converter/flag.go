@@ -17,7 +17,7 @@ var (
 	FlagComma      = ","
 	FlagDash       = "-"
 	FlagSlash      = "/"
-	FlagGroup      = "Category"
-	FlagVarian     = "Lucky"
+	FlagCategory   = "Category"
+	FlagVarian     = "Varian"
 	FlagLink       = "Link"
 )

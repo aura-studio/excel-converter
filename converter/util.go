@@ -11,6 +11,12 @@ import (
 	"strings"
 )
 
+func Debug(s string, args ...interface{}) {
+	if debugMode {
+		log.Printf(s, args...)
+	}
+}
+
 func Exit(v interface{}, args ...interface{}) {
 	switch v := v.(type) {
 	case error:

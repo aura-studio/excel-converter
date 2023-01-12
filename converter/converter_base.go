@@ -2,7 +2,6 @@ package converter
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"io/fs"
 	"os"
@@ -17,7 +16,6 @@ type Domain map[ExcelType][]Excel
 type Task func() interface{}
 
 type ConverterBase struct {
-	debug      bool
 	typ        ConverterType
 	relPath    string
 	excelMap   map[string]map[string]Domain
@@ -26,7 +24,6 @@ type ConverterBase struct {
 
 func NewConverterBase(typ ConverterType) *ConverterBase {
 	return &ConverterBase{
-		debug:      false,
 		typ:        typ,
 		excelMap:   make(map[string]map[string]Domain),
 		contentMap: make(map[string]string),
@@ -146,12 +143,6 @@ func (c *ConverterBase) Scan() {
 		}
 	})
 
-	if c.debug {
-		c.Debug()
-	}
-}
-
-func (c *ConverterBase) Debug() {
 	for packageName, pkgExcelMap := range c.excelMap {
 		for domain, domainExcelMap := range pkgExcelMap {
 			for typ, typeExcels := range domainExcelMap {
@@ -164,7 +155,7 @@ func (c *ConverterBase) Debug() {
 					}
 				}
 				buf.WriteString(`]`)
-				fmt.Printf("[Excel] %v/%v/%v/%v\n", packageName, domain, typ, buf.String())
+				Debug("[%v/%v/%v/...] scanned %v", packageName, domain, typ, buf.String())
 			}
 		}
 	}
@@ -193,6 +184,7 @@ func (c *ConverterBase) Write() {
 		return func() interface{} {
 			absPath := param.(string)
 			content := c.contentMap[absPath]
+			Debug("[%v] write %d bytes", absPath, len(content))
 			if err := c.WriteFile(absPath, content); err != nil {
 				Exit("[%v] Write file error: %v", absPath, err)
 			}

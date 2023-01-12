@@ -94,8 +94,8 @@ func (c *ConverterGo) Identity() {
 
 	c.identifier.GenerateTypeEqual()
 
-	if c.debug {
-		c.identifier.Debug()
+	for str, nodeID := range c.identifier.StrNodeMap {
+		Debug("[Identifier] struct[%v] = %s\n", nodeID, str)
 	}
 }
 

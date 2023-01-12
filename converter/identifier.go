@@ -169,9 +169,3 @@ func (i *Identifier) concatStruct(node Node) string {
 	}
 	return fmt.Sprintf("{%s}", b.String())
 }
-
-func (i *Identifier) Debug() {
-	for str, nodeID := range i.StrNodeMap {
-		fmt.Printf("[Identifier] struct[%v] = %s\n", nodeID, str)
-	}
-}
