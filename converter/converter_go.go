@@ -18,7 +18,6 @@ func NewConverterGo() *ConverterGo {
 		identifier:    NewIdentifier(),
 		collection:    NewCollection(),
 	}
-	c.SetRelPath(path.ExportRelPath())
 	return c
 }
 
@@ -231,8 +230,7 @@ func (c *ConverterGo) GetDataPath(domain Domain) string {
 		for _, excel := range excels {
 			goPackageName := format.ToGoPackageCase(excel.PackageName())
 			fileName := fmt.Sprintf("%s.go", format.ToLower(excel.DomainName()))
-			relPath := filepath.Join(c.relPath, goPackageName, fileName)
-			return path.Abs(relPath)
+			return filepath.Join(path.ExportAbsPath(), goPackageName, fileName)
 		}
 	}
 	Exit("[Main] Cannot find excel in domain")
@@ -244,8 +242,7 @@ func (c *ConverterGo) GetVarPath(packageName string) string {
 		for _, excels := range domain {
 			for _, excel := range excels {
 				goPackageName := format.ToGoPackageCase(excel.PackageName())
-				relPath := filepath.Join(c.relPath, goPackageName, "var.go")
-				return path.Abs(relPath)
+				return filepath.Join(path.ExportAbsPath(), goPackageName, "var.go")
 			}
 		}
 	}
@@ -255,13 +252,11 @@ func (c *ConverterGo) GetVarPath(packageName string) string {
 }
 
 func (c *ConverterGo) GetStructsPath() string {
-	relPath := filepath.Join(c.relPath, "structs", "structs.go")
-	return path.Abs(relPath)
+	return filepath.Join(path.ExportAbsPath(), "structs", "structs.go")
 }
 
 func (c *ConverterGo) GetStoragePath() string {
-	relPath := filepath.Join(c.relPath, "storage", "storage.go")
-	return path.Abs(relPath)
+	return filepath.Join(path.ExportAbsPath(), "storage", "storage.go")
 }
 
 func (c *ConverterGo) GetPackageName(domain Domain) string {

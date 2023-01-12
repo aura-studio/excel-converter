@@ -10,7 +10,6 @@ import (
 
 type ExcelBase struct {
 	fieldType FieldType
-	path      Path
 	relPath   string
 	file      *excelize.File
 	sheetMap  map[SheetType]map[string]Sheet
@@ -20,7 +19,6 @@ type ExcelBase struct {
 func NewExcelBase(path Path, relPath string, fieldType FieldType) *ExcelBase {
 	return &ExcelBase{
 		fieldType: fieldType,
-		path:      path,
 		relPath:   relPath,
 		sheetMap:  map[SheetType]map[string]Sheet{},
 	}
@@ -53,9 +51,9 @@ func (e *ExcelBase) SheetMap() map[SheetType]map[string]Sheet {
 func (e *ExcelBase) ReadFile() map[string][][]string {
 	var data = make(map[string][][]string)
 	var err error
-	e.file, err = excelize.OpenFile(e.path.Abs(e.relPath))
+	e.file, err = excelize.OpenFile(filepath.Join(path.ImportAbsPath(), e.relPath))
 	if err != nil {
-		Exit("[%v] Read %v error, %v", e.Name(), err)
+		Exit("[%v] Read %v error, %v", e, e, err)
 	}
 	sheetMap := e.file.GetSheetMap()
 	for _, sheetName := range sheetMap {
@@ -70,22 +68,22 @@ func (e *ExcelBase) ReadFile() map[string][][]string {
 
 func (e *ExcelBase) PackageName() string {
 	strs := strings.Split(e.relPath, string(os.PathSeparator))
-	if len(strs) < 4 {
+	if len(strs) < 3 {
 		Exit("[%v] Error rel path", e)
 	}
-	return strs[1]
+	return strs[0]
 }
 
 func (e *ExcelBase) DomainName() string {
 	strs := strings.Split(e.relPath, string(os.PathSeparator))
 	length := len(strs)
 	switch {
-	case length < 4:
+	case length < 3:
 		Exit("[%v] Error rel path", e)
-	case length == 4: // excel当作Domain
+	case length == 3: // excel当作Domain
 		return e.FixedName()
-	case length > 4:
-		return format.ToUpper(strs[3])
+	case length > 3:
+		return format.ToUpper(strs[2])
 	}
 	return FlagDefault
 }
@@ -94,11 +92,11 @@ func (e *ExcelBase) IndirectName() string {
 	strs := strings.Split(e.relPath, string(os.PathSeparator))
 	length := len(strs)
 	switch {
-	case length < 4:
+	case length < 3:
 		Exit("[%v] Error rel path", e)
-	case length == 4: // excel当作Domain
+	case length == 3: // excel当作Domain
 		return FlagDefault
-	case length > 4:
+	case length > 3:
 		return e.FixedName()
 	}
 	return FlagDefault

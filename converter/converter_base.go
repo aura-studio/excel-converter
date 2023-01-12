@@ -2,6 +2,7 @@ package converter
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"io/fs"
 	"os"
@@ -17,7 +18,6 @@ type Task func() interface{}
 
 type ConverterBase struct {
 	typ        ConverterType
-	relPath    string
 	excelMap   map[string]map[string]Domain
 	contentMap map[string]string
 }
@@ -109,7 +109,10 @@ func (c *ConverterBase) Scan() {
 		if filepath.Ext(fileName) != FlagExt {
 			return nil
 		}
-		relPath := path.Rel(absPath)
+		relPath, err := filepath.Rel(path.ImportAbsPath(), absPath)
+		if err != nil {
+			return err
+		}
 		excelType := c.ExcelType(relPath)
 		var fieldType FieldType
 		switch c.typ {
@@ -129,6 +132,7 @@ func (c *ConverterBase) Scan() {
 		if _, ok := c.excelMap[packageName][domain]; !ok {
 			c.excelMap[packageName][domain] = make(map[ExcelType][]Excel)
 		}
+		Debug("Excel %v/%v/%v/%v", packageName, domain, excelType, excel.FixedName())
 		c.excelMap[packageName][domain][excelType] = append(c.excelMap[packageName][domain][excelType], excel)
 		return nil
 	}); err != nil {
@@ -196,10 +200,9 @@ func (c *ConverterBase) Write() {
 func (c *ConverterBase) WriteFile(absPath string, s string) error {
 	// if dir not exists, then create it
 	fileDir := filepath.Dir(absPath)
-	if _, err := os.Stat(fileDir); err != nil {
-		if err = os.MkdirAll(fileDir, os.ModePerm); err != nil {
-			panic(err)
-		}
+	fmt.Println(absPath, fileDir)
+	if err := os.MkdirAll(fileDir, os.ModePerm); err != nil {
+		panic(fmt.Errorf("[%s], %v", absPath, err))
 	}
 	// if already exists then remove it
 	if _, err := os.Stat(absPath); err == nil {
@@ -265,17 +268,13 @@ func (c *ConverterBase) Build() {
 	})
 }
 
-func (c *ConverterBase) SetRelPath(relPath string) {
-	c.relPath = relPath
-}
-
 func (c *ConverterBase) Remove() {
-	absPath := path.Abs(c.relPath)
-	err := os.RemoveAll(absPath)
+	fmt.Println(path.ExportAbsPath())
+	err := os.RemoveAll(path.ExportAbsPath())
 	if err != nil {
 		Exit("[Main] Remove error, %v", err)
 	}
-	err = os.Mkdir(absPath, os.ModePerm)
+	err = os.Mkdir(path.ExportAbsPath(), os.ModePerm)
 	if err != nil {
 		Exit("[Main] Mkdir error, %v", err)
 	}
