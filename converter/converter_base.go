@@ -200,7 +200,6 @@ func (c *ConverterBase) Write() {
 func (c *ConverterBase) WriteFile(absPath string, s string) error {
 	// if dir not exists, then create it
 	fileDir := filepath.Dir(absPath)
-	fmt.Println(absPath, fileDir)
 	if err := os.MkdirAll(fileDir, os.ModePerm); err != nil {
 		panic(fmt.Errorf("[%s], %v", absPath, err))
 	}
@@ -269,7 +268,6 @@ func (c *ConverterBase) Build() {
 }
 
 func (c *ConverterBase) Remove() {
-	fmt.Println(path.ExportAbsPath())
 	err := os.RemoveAll(path.ExportAbsPath())
 	if err != nil {
 		Exit("[Main] Remove error, %v", err)
