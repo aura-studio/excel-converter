@@ -93,9 +93,10 @@ func (p *RootPath) Rel(path string) string {
 }
 
 func (p *RootPath) ImportPath() string {
-	importPath, err := filepath.Rel(p.ProjectAbsPath(), filepath.Join(p.ProjectAbsPath(), p.Dirname(), path.relExportPath))
+	relPath, err := filepath.Rel(p.ProjectAbsPath(), filepath.Join(p.ProjectAbsPath(), p.Dirname(), path.relExportPath))
 	if err != nil {
 		Exit("[Main] Get import path error %v", err)
 	}
+	importPath := filepath.Join(filepath.Base(p.ProjectAbsPath()), relPath)
 	return filepath.ToSlash(importPath)
 }
