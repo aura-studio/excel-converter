@@ -20,4 +20,5 @@ var (
 	FlagCategory   = "__Category"
 	FlagVarian     = "__Varian"
 	FlagLink       = "__Link"
+	FlagTimeZone   = "0"
 )

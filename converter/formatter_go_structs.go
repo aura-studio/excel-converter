@@ -1,5 +1,7 @@
 package converter
 
+import "fmt"
+
 type FormatterGoStructs struct {
 	*FormatterBase
 	used       bool
@@ -11,7 +13,7 @@ func NewFormatterGoStructs(identifier *Identifier) *FormatterGoStructs {
 		FormatterBase: NewFormatterBase(),
 		identifier:    identifier,
 	}
-	f.WriteString(`// Package structs <important: auto generate by excel-to-go converter, do not modify>
+	f.WriteString(fmt.Sprintf(`// Package structs <important: auto generate by excel-to-go converter, do not modify>
 package structs
 
 import (
@@ -20,7 +22,7 @@ import (
 	"time"
 )
 
-var timeLocation = time.FixedZone("AWS", -4*3600)
+var timeLocation = time.FixedZone("SYS", %s)
 
 func NewTime(year, month, day, hour, minute, second int) *time.Time {
 	tm := time.Date(year, time.Month(month), day, hour, minute, second, 0, timeLocation)
@@ -55,7 +57,7 @@ func NewBigRat(s string) *big.Rat {
 }
 
 type (
-`)
+`, FlagTimeZone))
 	return f
 }
 
