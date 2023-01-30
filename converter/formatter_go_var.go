@@ -13,6 +13,11 @@ type FormatterGoVar struct {
 }
 
 func NewFormatterGoVar(packageName string, identifier *Identifier) *FormatterGoVar {
+	importPath, err := filepath.Rel(path.ProjectAbsPath(), filepath.Join(path.ProjectAbsPath(), path.Dirname()+"/"+filepath.ToSlash(path.relExportPath)))
+	if err != nil {
+		panic(err)
+	}
+
 	f := &FormatterGoVar{
 		FormatterBase: NewFormatterBase(),
 		packageName:   packageName,
@@ -24,7 +29,7 @@ package %s
 import "%s/structs"
 
 var (
-`, packageName, path.Dirname()+"/"+filepath.ToSlash(path.relExportPath)))
+`, packageName, importPath))
 	f.IncDepth()
 	return f
 }

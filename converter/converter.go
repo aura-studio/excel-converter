@@ -26,16 +26,17 @@ func init() {
 }
 
 type Config struct {
-	Type       string
-	ImportPath string
-	ExportPath string
+	Type        string
+	ImportPath  string
+	ExportPath  string
+	ProjectPath string
 }
 
 func Run(c Config) {
 	if converterCreator, ok := converterCreators[ConverterType(c.Type)]; !ok {
 		Exit("[Main] Converter %s is not supported", c.Type)
 	} else {
-		path.Init(c.ImportPath, c.ExportPath)
+		path.Init(c.ImportPath, c.ExportPath, c.ProjectPath)
 		converterCreator().Run()
 	}
 }

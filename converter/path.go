@@ -16,9 +16,10 @@ type Path interface {
 }
 
 type RootPath struct {
-	root          string
-	relImportPath string
-	relExportPath string
+	root           string
+	relImportPath  string
+	relExportPath  string
+	relProjectPath string
 }
 
 var path = NewRootPath()
@@ -27,10 +28,11 @@ func NewRootPath() *RootPath {
 	return &RootPath{}
 }
 
-func (p *RootPath) Init(relImportPath, relExportPath string) {
+func (p *RootPath) Init(relImportPath, relExportPath, relProjectPath string) {
 	p.root = p.findRoot()
 	p.relImportPath = relImportPath
 	p.relExportPath = relExportPath
+	p.relProjectPath = relProjectPath
 }
 
 func (p *RootPath) Dirname() string {
@@ -55,6 +57,14 @@ func (p *RootPath) ExportAbsPath() string {
 
 func (p *RootPath) ExportRelPath() string {
 	return p.relExportPath
+}
+
+func (p *RootPath) ProjectAbsPath() string {
+	return p.Abs(p.relProjectPath)
+}
+
+func (p *RootPath) ProjectRelPath() string {
+	return p.relProjectPath
 }
 
 func (p *RootPath) findRoot() string {

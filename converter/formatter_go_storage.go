@@ -86,11 +86,16 @@ func Load(dataMap map[string]string, name string, v interface{}) {
 }
 
 func (f *FormatterGoStorage) FormatPackage(packageNames []string) {
+	importPath, err := filepath.Rel(path.ProjectAbsPath(), filepath.Join(path.ProjectAbsPath(), path.Dirname()+"/"+filepath.ToSlash(path.relExportPath)))
+	if err != nil {
+		panic(err)
+	}
+
 	f.WriteString("import (\n")
 	f.WriteString("\t\"encoding/json\"\n")
 	for _, packageName := range packageNames {
 		f.WriteString("\t\"")
-		f.WriteString(path.Dirname() + "/" + filepath.ToSlash(path.relExportPath) + "/")
+		f.WriteString(importPath + "/")
 		goPackageName := format.ToGoPackageCase(packageName)
 		f.WriteString(goPackageName)
 		f.WriteString("\"\n")
