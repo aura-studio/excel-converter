@@ -32,7 +32,11 @@ func (p *RootPath) Init(relImportPath, relExportPath, relProjectPath string) {
 	p.root = p.findRoot()
 	p.relImportPath = relImportPath
 	p.relExportPath = relExportPath
-	p.relProjectPath = relProjectPath
+	if relProjectPath == "" {
+		p.relProjectPath = p.root
+	} else {
+		p.relProjectPath = relProjectPath
+	}
 }
 
 func (p *RootPath) Dirname() string {
@@ -86,4 +90,12 @@ func (p *RootPath) Rel(path string) string {
 		Exit("[Main] Get rel file path error %v", path)
 	}
 	return relPath
+}
+
+func (p *RootPath) ImportPath() string {
+	importPath, err := filepath.Rel(p.ProjectAbsPath(), filepath.Join(p.ProjectAbsPath(), p.Dirname(), path.relExportPath))
+	if err != nil {
+		Exit("[Main] Get import path error %v", err)
+	}
+	return filepath.ToSlash(importPath)
 }

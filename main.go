@@ -10,8 +10,8 @@ import (
 )
 
 func main() {
-	if len(os.Args) < 4 {
-		log.Println("Requires at least 4 argument")
+	if len(os.Args) < 3 {
+		log.Println("Requires at least 3 argument")
 	}
 	fmt.Println("Start...")
 	beginTm := time.Now()
@@ -22,10 +22,13 @@ func main() {
 	}()
 
 	c := Config{
-		Type:        os.Args[1],
-		ImportPath:  os.Args[2],
-		ExportPath:  os.Args[3],
-		ProjectPath: os.Args[4],
+		Type:       os.Args[1],
+		ImportPath: os.Args[2],
+		ExportPath: os.Args[3],
+	}
+
+	if len(os.Args) > 4 {
+		c.ProjectPath = os.Args[4]
 	}
 
 	Run(c)
