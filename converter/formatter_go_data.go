@@ -2,7 +2,6 @@ package converter
 
 import (
 	"fmt"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -18,10 +17,6 @@ type FormatterGoData struct {
 }
 
 func NewFormatterGoData(packageName string, identifier *Identifier) *FormatterGoData {
-	importPath, err := filepath.Rel(path.ProjectAbsPath(), filepath.Join(path.ProjectAbsPath(), path.Dirname()+"/"+filepath.ToSlash(path.relExportPath)))
-	if err != nil {
-		panic(err)
-	}
 	f := &FormatterGoData{
 		FormatterBase: NewFormatterBase(),
 		packageName:   packageName,
@@ -37,7 +32,7 @@ package %s
 import "%s/structs"
 
 func init() {
-`, packageName, importPath))
+`, packageName, path.ImportPath()))
 	f.IncDepth()
 	return f
 }
