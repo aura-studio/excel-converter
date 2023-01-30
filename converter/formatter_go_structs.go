@@ -13,7 +13,7 @@ func NewFormatterGoStructs(identifier *Identifier) *FormatterGoStructs {
 		FormatterBase: NewFormatterBase(),
 		identifier:    identifier,
 	}
-	f.WriteString(fmt.Sprintf(`// Package structs <important: auto generate by excel-to-go converter, do not modify>
+	f.WriteString(`// Package structs <important: auto generate by excel-to-go converter, do not modify>
 package structs
 
 import (
@@ -21,9 +21,12 @@ import (
 	"math/big"
 	"time"
 )
-
+`)
+	f.WriteString(fmt.Sprintf(`
 var timeLocation = time.FixedZone("SYS", %s)
+`, FlagTimeZone))
 
+	f.WriteString(`
 func NewTime(year, month, day, hour, minute, second int) *time.Time {
 	tm := time.Date(year, time.Month(month), day, hour, minute, second, 0, timeLocation)
 	return &tm
@@ -57,7 +60,7 @@ func NewBigRat(s string) *big.Rat {
 }
 
 type (
-`, FlagTimeZone))
+`)
 	return f
 }
 

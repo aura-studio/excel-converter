@@ -38,11 +38,8 @@ func (f Format) ToLowerRaw(s string) string {
 func (f Format) ToUpper(s string) string {
 	s = strings.ReplaceAll(s, " ", "")
 	s = strings.TrimSuffix(s, filepath.Ext(s))
-	if strings.HasPrefix(s, FlagClient) {
-		s = strings.TrimPrefix(s, FlagClient)
-	} else if strings.HasPrefix(s, FlagServer) {
-		s = strings.TrimPrefix(s, FlagServer)
-	}
+	s = strings.TrimPrefix(s, FlagClient)
+	s = strings.TrimPrefix(s, FlagServer)
 	if submatches := templateRegExp.FindAllStringSubmatch(s, -1); len(submatches) > 0 {
 		s = submatches[0][1]
 	}

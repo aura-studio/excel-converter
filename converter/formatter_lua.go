@@ -129,7 +129,7 @@ func (f *FormatterLua) FormatBase(node Node, sources []Source) {
 			var err error
 			if len(content) == 0 {
 				tm = time.Time{}
-			} else if strings.Index(content, ".") < 0 {
+			} else if !strings.Contains(content, ".") {
 				tm, err = format.ParseTime(content)
 				if err != nil {
 					Exit("[%v] Unknown time format %s", source.Sheet(), content)

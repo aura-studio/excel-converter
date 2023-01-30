@@ -48,4 +48,3 @@ func (s *SheetInferior) sectionType(index int, row []string) SectionType {
 		return SectionTypeContent
 	}
 }
-
