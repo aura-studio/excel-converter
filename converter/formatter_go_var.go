@@ -24,7 +24,7 @@ package %s
 import "%s/structs"
 
 var (
-`, packageName, filepath.ToSlash(path.relExportPath)))
+`, packageName, path.Dirname()+"/"+filepath.ToSlash(path.relExportPath)))
 	f.IncDepth()
 	return f
 }

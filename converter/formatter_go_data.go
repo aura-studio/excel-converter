@@ -33,7 +33,7 @@ package %s
 import "%s/structs"
 
 func init() {
-`, packageName, filepath.ToSlash(path.relExportPath)))
+`, packageName, path.Dirname()+"/"+filepath.ToSlash(path.relExportPath)))
 	f.IncDepth()
 	return f
 }
