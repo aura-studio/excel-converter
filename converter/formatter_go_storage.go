@@ -90,7 +90,7 @@ func (f *FormatterGoStorage) FormatPackage(packageNames []string) {
 	f.WriteString("\t\"encoding/json\"\n")
 	for _, packageName := range packageNames {
 		f.WriteString("\t\"")
-		f.WriteString(path.Dirname() + "/" + filepath.ToSlash(path.relExportPath) + "/")
+		f.WriteString(filepath.ToSlash(path.relExportPath) + "/")
 		goPackageName := format.ToGoPackageCase(packageName)
 		f.WriteString(goPackageName)
 		f.WriteString("\"\n")
