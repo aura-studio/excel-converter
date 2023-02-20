@@ -56,6 +56,7 @@ func NewCollection() *Collection {
 	return &Collection{
 		storageMap: make(map[StoragePath]StorageVar),
 		linkMap:    make(map[LinkPath]LinkPath),
+		categories: []string{FlagBase},
 	}
 }
 
@@ -143,7 +144,6 @@ func (l *Collection) ReadLink(sheet Sheet) {
 			}
 		}
 	case FlagCategory:
-		l.categories = append(l.categories, FlagBase)
 		branches := sheet.GetHorizon(0)
 		groups := sheet.GetHorizon(1)
 		for _, branch := range branches {
