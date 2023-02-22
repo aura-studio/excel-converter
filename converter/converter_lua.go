@@ -70,7 +70,7 @@ func (c *ConverterLua) GetFilePath(domain Domain) string {
 		for _, excel := range excels {
 			packageName := format.ToLuaPackageCase(excel.PackageName())
 			fileName := fmt.Sprintf("%s.lua", excel.DomainName())
-			return filepath.Join(path.ExportAbsPath(), path.ExportAbsPath(), packageName, fileName)
+			return filepath.Join(path.ExportAbsPath(), packageName, fileName)
 		}
 	}
 	Exit("[Main] Cannot find excel in domain")
