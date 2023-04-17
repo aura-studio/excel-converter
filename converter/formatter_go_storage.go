@@ -74,6 +74,9 @@ func Link(dstExcelName string, dstSheetName string, srcExcelName string, srcShee
 }
 
 func Load(dataMap map[string]string, name string, v interface{}) {
+	if _, ok := dataMap[name]; !ok {
+		return
+	}
 	if err := json.Unmarshal([]byte(dataMap[name]), v); err != nil {
 		panic(err)
 	}
