@@ -1,7 +1,6 @@
 package converter
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 )
