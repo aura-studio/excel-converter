@@ -1,6 +1,7 @@
 package converter
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -93,7 +94,7 @@ func (p *RootPath) Rel(path string) string {
 }
 
 func (p *RootPath) ImportPath() string {
-	relPath, err := filepath.Rel(p.ProjectAbsPath(), filepath.Join(p.ProjectAbsPath(), p.Dirname(), path.relExportPath))
+	relPath, err := filepath.Rel(p.ProjectAbsPath(), filepath.Join(p.ProjectAbsPath(), path.relExportPath))
 	if err != nil {
 		Exit("[Main] Get import path error %v", err)
 	}
