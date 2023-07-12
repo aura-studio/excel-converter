@@ -22,11 +22,14 @@ func (f *FormatterGoStorage) Close() string {
 func Set(packageName string, excelName string, sheetName string, v interface{}) {
 	if _, ok := Storage[packageName]; !ok {
 		Storage[packageName] = make(map[string]map[string]interface{})
+		OriginStorage[packageName] = make(map[string]map[string]interface{})
 	}
 	if _, ok := Storage[packageName][excelName]; !ok {
 		Storage[packageName][excelName] = make(map[string]interface{})
+		OriginStorage[packageName][excelName] = make(map[string]interface{})
 	}
 	Storage[packageName][excelName][sheetName] = v
+	OriginStorage[packageName][excelName][sheetName] = v
 }
 
 func Parent(packageName string) string {
@@ -100,6 +103,7 @@ func (f *FormatterGoStorage) FormatPackage(packageNames []string) {
 	f.WriteString(")\n")
 	f.WriteString(`
 var Storage = make(map[string]map[string]map[string]interface{})
+var OriginStorage = make(map[string]map[string]map[string]interface{})
 
 `)
 }
