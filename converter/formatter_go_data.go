@@ -94,7 +94,11 @@ func (f *FormatterGoData) FormatBase(node Node, sources []Source) {
 	source := sources[0]
 	switch node.Field().Structure {
 	case StructureTypeString:
-		f.WriteString(fmt.Sprintf("`%s`", source.Content()))
+		if strings.Contains(source.Content(), "\\") {
+			f.WriteString(fmt.Sprintf("`%s`", source.Content()))
+		} else {
+			f.WriteString(fmt.Sprintf(`"%s"`, source.Content()))
+		}
 	case StructureTypeInt, StructureTypeFloat:
 		switch source.Content() {
 		case "":
