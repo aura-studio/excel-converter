@@ -159,7 +159,7 @@ func (l *Collection) ReadLink(sheet Sheet) {
 				var newKeys []string
 				for _, key := range keys {
 					for _, layerKey := range layerKeys {
-						newKeys = append(newKeys, fmt.Sprintf("%s_%s", format.ToUpper(key), format.ToUpper(layerKey)))
+						newKeys = append(newKeys, fmt.Sprintf("%s_%s", key, format.ToUpper(layerKey)))
 					}
 				}
 				keys = newKeys
