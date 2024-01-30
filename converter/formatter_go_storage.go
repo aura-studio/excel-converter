@@ -40,7 +40,7 @@ func Parent(packageName string) string {
 	if len(strs) == 1 {
 		return "Base"
 	} else {
-		return strs[0]
+		return strings.Join(strs[:len(strs)-1], "_")
 	}
 }
 
