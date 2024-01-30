@@ -147,7 +147,7 @@ func (l *Collection) ReadLink(sheet Sheet) {
 	case FlagCategory:
 		var keys []string
 		var index = 0
-		for {
+		for index < sheet.HeaderSize() {
 			layerKeys := sheet.GetHorizon(index)
 			if len(layerKeys) == 0 {
 				break
