@@ -23,8 +23,8 @@ func NewFormatterGoData(packageName string, identifier *Identifier) *FormatterGo
 		identifier:    identifier,
 	}
 
-	f.WriteString(fmt.Sprintf(`//go:build !debug
-// +build !debug
+	f.WriteString(fmt.Sprintf(`//go:build !debug && !release
+// +build !debug !release
 
 // <important: auto generate by excel-to-go converter, do not modify>
 package %s
