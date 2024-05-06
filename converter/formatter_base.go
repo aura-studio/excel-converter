@@ -2,6 +2,11 @@ package converter
 
 import "bytes"
 
+type Formatter interface {
+	FormatNode(node Node)
+	Close() string
+}
+
 type FormatterBase struct {
 	*bytes.Buffer
 	depth int

@@ -155,7 +155,12 @@ func (c *ConverterGo) FormatData() {
 	results := c.Parallel(ToSlice(domains), func(param interface{}) func() interface{} {
 		return func() interface{} {
 			domain := param.(Domain)
-			formatter := NewFormatterGoData(c.GetPackageName(domain), c.identifier)
+			var formatter Formatter
+			if dataExportType == DataExportTypeJSON {
+				formatter = NewFormatterGoJSON(c.GetPackageName(domain), c.identifier)
+			} else {
+				formatter = NewFormatterGoData(c.GetPackageName(domain), c.identifier)
+			}
 			for _, excel := range domain[ExcelTypeRegular] {
 				for _, node := range excel.Nodes() {
 					if node.Excel().ForServer() && node.Sheet().ForServer() {

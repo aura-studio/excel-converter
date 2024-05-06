@@ -21,5 +21,4 @@ var (
 	FlagVarian     = "__Varian"
 	FlagLink       = "__Link"
 	FlagTimeZone   = "0"
-	FlagGoData     = "__GoData"
 )
