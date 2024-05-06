@@ -123,9 +123,49 @@ func (f *FormatterGoJSON) FormatBase(node Node, sources []Source) {
 }
 
 func (f *FormatterGoJSON) FormatFieldBase(node Node, sources []Source) {
-	f.WriteByte('"')
-	f.FormatBase(node, sources)
-	f.WriteByte('"')
+	source := sources[0]
+	switch node.Field().Structure {
+	case StructureTypeString:
+		f.WriteString(strconv.Quote(source.Content()))
+	case StructureTypeInt, StructureTypeFloat:
+		f.WriteByte('"')
+		switch source.Content() {
+		case "":
+			f.WriteString("0")
+		default:
+			f.WriteString(source.Content())
+		}
+		f.WriteByte('"')
+	case StructureTypeBool:
+		f.WriteByte('"')
+		switch source.Content() {
+		case "0", FlagFalse, "":
+			f.WriteString(FlagFalse)
+		case "1", FlagTrue:
+			f.WriteString(FlagTrue)
+		default:
+			Exit("[%v] Unknown bool value %s", source.Sheet(), source.Content())
+		}
+		f.WriteByte('"')
+	case StructureTypeBigInt: // TODO: not support yet. TO Fill func MarshalJSON UnmarshalJSON
+		f.WriteByte('"')
+		f.WriteString(source.Content())
+		f.WriteByte('"')
+	case StructureTypeBigFloat: // TODO: not support yet. TO Fill func MarshalJSON UnmarshalJSON
+		f.WriteByte('"')
+		f.WriteString(source.Content())
+		f.WriteByte('"')
+	case StructureTypeBigRat: // TODO: not support yet. TO Fill func MarshalJSON UnmarshalJSON
+		f.WriteByte('"')
+		f.WriteString(source.Content())
+		f.WriteByte('"')
+	case StructureTypeTime: // TODO: not support yet. TO Fill func MarshalJSON UnmarshalJSON
+		f.WriteByte('"')
+		f.WriteString(source.Content())
+		f.WriteByte('"')
+	default:
+		Exit("[%v] Unknown structure %s", source.Sheet(), node.Field().Structure)
+	}
 }
 
 func (f *FormatterGoJSON) FormatSlice(node Node, sources []Source) {
