@@ -23,8 +23,8 @@ func NewFormatterGoData(packageName string, identifier *Identifier) *FormatterGo
 		identifier:    identifier,
 	}
 
-	f.WriteString(fmt.Sprintf(`//go:build !debug && !release
-// +build !debug !release
+	f.WriteString(fmt.Sprintf(`//go:build %s
+// +build %s
 
 // <important: auto generate by excel-to-go converter, do not modify>
 package %s
@@ -32,7 +32,7 @@ package %s
 import "%s/structs"
 
 func init() {
-`, packageName, path.ImportPath()))
+`, FlagGoData, FlagGoData, packageName, path.ImportPath()))
 	f.IncDepth()
 	return f
 }
