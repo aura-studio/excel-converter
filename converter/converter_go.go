@@ -120,7 +120,8 @@ func (c *ConverterGo) Link() {
 }
 
 func (c *ConverterGo) Format() {
-	c.FormatData()
+	c.FormatLiteralData()
+	c.FormatJSONData()
 	c.FormatVar()
 	c.FormatStructs()
 	c.FormatStorage()
@@ -147,7 +148,7 @@ func (c *ConverterGo) FormatStorage() {
 	c.contentMap[filePath] = content
 }
 
-func (c *ConverterGo) FormatData() {
+func (c *ConverterGo) FormatLiteralData() {
 	domains := make([]Domain, 0)
 	c.ForeachDomain(func(domain Domain) {
 		domains = append(domains, domain)
@@ -155,12 +156,7 @@ func (c *ConverterGo) FormatData() {
 	results := c.Parallel(ToSlice(domains), func(param interface{}) func() interface{} {
 		return func() interface{} {
 			domain := param.(Domain)
-			var formatter Formatter
-			if dataExportType == DataExportTypeJSON {
-				formatter = NewFormatterGoJSON(c.GetPackageName(domain), c.identifier)
-			} else {
-				formatter = NewFormatterGoData(c.GetPackageName(domain), c.identifier)
-			}
+			formatter := NewFormatterGoData(c.GetPackageName(domain), c.identifier)
 			for _, excel := range domain[ExcelTypeRegular] {
 				for _, node := range excel.Nodes() {
 					if node.Excel().ForServer() && node.Sheet().ForServer() {
@@ -172,7 +168,40 @@ func (c *ConverterGo) FormatData() {
 			if len(content) == 0 {
 				return nil
 			}
-			return []string{c.GetDataPath(domain), content}
+			return []string{c.GetLiteralDataPath(domain), content}
+		}
+	})
+	for _, result := range results {
+		if result == nil {
+			continue
+		}
+		filePath := result.([]string)[0]
+		content := result.([]string)[1]
+		c.contentMap[filePath] = content
+	}
+}
+
+func (c *ConverterGo) FormatJSONData() {
+	domains := make([]Domain, 0)
+	c.ForeachDomain(func(domain Domain) {
+		domains = append(domains, domain)
+	})
+	results := c.Parallel(ToSlice(domains), func(param interface{}) func() interface{} {
+		return func() interface{} {
+			domain := param.(Domain)
+			formatter := NewFormatterGoJSONData(c.GetPackageName(domain), c.identifier)
+			for _, excel := range domain[ExcelTypeRegular] {
+				for _, node := range excel.Nodes() {
+					if node.Excel().ForServer() && node.Sheet().ForServer() {
+						formatter.FormatNode(node)
+					}
+				}
+			}
+			content := formatter.Close()
+			if len(content) == 0 {
+				return nil
+			}
+			return []string{c.GetJSONDataPath(domain), content}
 		}
 	})
 	for _, result := range results {
@@ -230,11 +259,23 @@ func (c *ConverterGo) FormatVar() {
 	}
 }
 
-func (c *ConverterGo) GetDataPath(domain Domain) string {
+func (c *ConverterGo) GetLiteralDataPath(domain Domain) string {
 	for _, excels := range domain {
 		for _, excel := range excels {
 			goPackageName := format.ToGoPackageCase(excel.PackageName())
-			fileName := fmt.Sprintf("%s.go", format.ToLower(excel.DomainName()))
+			fileName := fmt.Sprintf("literal_%s.go", format.ToLower(excel.DomainName()))
+			return filepath.Join(path.ExportAbsPath(), goPackageName, fileName)
+		}
+	}
+	Exit("[Main] Cannot find excel in domain")
+	return ""
+}
+
+func (c *ConverterGo) GetJSONDataPath(domain Domain) string {
+	for _, excels := range domain {
+		for _, excel := range excels {
+			goPackageName := format.ToGoPackageCase(excel.PackageName())
+			fileName := fmt.Sprintf("json_%s.go", format.ToLower(excel.DomainName()))
 			return filepath.Join(path.ExportAbsPath(), goPackageName, fileName)
 		}
 	}
