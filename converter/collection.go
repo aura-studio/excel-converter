@@ -173,6 +173,6 @@ func (l *Collection) ReadLink(sheet Sheet) {
 			index++
 		}
 
-		sort.Strings(l.categories)
+		sort.Strings(l.categories[1:])
 	}
 }
