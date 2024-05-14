@@ -102,6 +102,16 @@ func (e *ExcelBase) IndirectName() string {
 	return FlagDefault
 }
 
+func (e *ExcelBase) Category() string {
+	strs := strings.Split(e.relPath, string(os.PathSeparator))
+	length := len(strs)
+	switch {
+	case length < 3:
+		Exit("[%v] Error rel path", e)
+	}
+	return format.ToUpper(strs[0])
+}
+
 func (e *ExcelBase) Name() string {
 	return filepath.Base(e.relPath)
 }

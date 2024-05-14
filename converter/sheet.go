@@ -29,6 +29,7 @@ type Sheet interface {
 	FormatContent()
 	ForServer() bool
 	ForClient() bool
+	Category() string
 }
 
 var sheetCreators map[SheetType]func(excel Excel, name string, rows [][]string) Sheet

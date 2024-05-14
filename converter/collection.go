@@ -29,12 +29,13 @@ type StorageVar struct {
 }
 
 type LinkPath struct {
+	Category  string
 	ExcelName string
 	SheetName string
 }
 
 func (l *LinkPath) String() string {
-	return fmt.Sprintf("%s:%s", l.ExcelName, l.SheetName)
+	return fmt.Sprintf("%s:%s:%s", l.Category, l.ExcelName, l.SheetName)
 }
 
 type Link struct {
@@ -120,26 +121,28 @@ func (l *Collection) ReadLink(sheet Sheet) {
 	switch sheet.Name() {
 	case FlagLink:
 		for index := 0; index < sheet.VerticleSize(); index++ {
+			category := sheet.Excel().Category()
 			srcExcelName := sheet.GetCell(sheet.GetHeaderField(format.ToUpper(CollectionHeaderSrcExcel)), index)
 			dstExcelName := sheet.GetCell(sheet.GetHeaderField(format.ToUpper(CollectionHeaderDstExcel)), index)
 			srcSheetName := sheet.GetCell(sheet.GetHeaderField(format.ToUpper(CollectionHeaderSrcSheet)), index)
 			dstSheetName := sheet.GetCell(sheet.GetHeaderField(format.ToUpper(CollectionHeaderDstSheet)), index)
 
-			srcLinkPath := LinkPath{srcExcelName, srcSheetName}
-			dstLinkPath := LinkPath{dstExcelName, dstSheetName}
+			srcLinkPath := LinkPath{category, srcExcelName, srcSheetName}
+			dstLinkPath := LinkPath{category, dstExcelName, dstSheetName}
 
 			l.linkMap[dstLinkPath] = srcLinkPath
 		}
 	case FlagVarian:
 		for horizonIndex := 1; horizonIndex < sheet.HeaderSize(); horizonIndex++ {
 			for verticleIndex := 1; verticleIndex < sheet.VerticleSize(); verticleIndex++ {
+				category := sheet.Excel().Category()
 				srcExcelName := sheet.GetHeaderField(horizonIndex).Name
 				dstExcelName := sheet.GetHeaderField(horizonIndex).Name
 				srcSheetName := sheet.GetCell(sheet.GetHeaderField(horizonIndex), verticleIndex)
 				dstSheetName := fmt.Sprintf("%s/%s", sheet.GetCell(sheet.GetHeaderField(horizonIndex), 0), sheet.GetCell(sheet.GetHeaderField(0), verticleIndex))
 
-				srcLinkPath := LinkPath{srcExcelName, srcSheetName}
-				dstLinkPath := LinkPath{dstExcelName, dstSheetName}
+				srcLinkPath := LinkPath{category, srcExcelName, srcSheetName}
+				dstLinkPath := LinkPath{category, dstExcelName, dstSheetName}
 
 				l.linkMap[dstLinkPath] = srcLinkPath
 			}

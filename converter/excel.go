@@ -19,6 +19,7 @@ type Excel interface {
 	PackageName() string
 	DomainName() string
 	IndirectName() string
+	Category() string
 	Type() ExcelType
 	GetSheet(string) Sheet
 	GetHeaderSize(string) int

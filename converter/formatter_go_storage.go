@@ -19,7 +19,7 @@ package storage
 
 func (f *FormatterGoStorage) Close() string {
 	f.WriteString(`
-func Set(packageName string, excelName string, sheetName string, v interface{}) {
+func Set(packageName, excelName, sheetName string, v interface{}) {
 	if _, ok := Storage[packageName]; !ok {
 		Storage[packageName] = make(map[string]map[string]interface{})
 		OriginStorage[packageName] = make(map[string]map[string]interface{})
@@ -44,7 +44,7 @@ func Parent(packageName string) string {
 	}
 }
 
-func Has(packageName string, excelName string, sheetName string) bool {
+func Has(packageName, excelName, sheetName string) bool {
 	if _, ok := Storage[packageName]; !ok {
 		return false
 	}
@@ -57,7 +57,7 @@ func Has(packageName string, excelName string, sheetName string) bool {
 	return true
 }
 
-func Find(packageName string, excelName string, sheetName string) interface{} {
+func Find(packageName, excelName, sheetName string) interface{} {
 	for {
 		if packageName == "" {
 			return nil
@@ -70,10 +70,8 @@ func Find(packageName string, excelName string, sheetName string) interface{} {
 	}
 }
 
-func Link(dstExcelName string, dstSheetName string, srcExcelName string, srcSheetName string) {
-	for _, category := range Categories {
-		Set(category, dstExcelName, dstSheetName, Find(category, srcExcelName, srcSheetName))
-	}
+func Link(dstCategory, dstExcelName, dstSheetName,srcCategory, srcExcelName, srcSheetName string) {
+	Set(dstCategory, dstExcelName, dstSheetName, Find(srcCategory, srcExcelName, srcSheetName))
 }
 
 func Load(dataMap map[string]string, name string, v interface{}) {
@@ -166,9 +164,13 @@ func LinksMapping() {
 `)
 	for _, link := range links {
 		f.WriteString("\tLink(\"")
+		f.WriteString(link.DstLinkPath.Category)
+		f.WriteString("\", \"")
 		f.WriteString(link.DstLinkPath.ExcelName)
 		f.WriteString("\", \"")
 		f.WriteString(link.DstLinkPath.SheetName)
+		f.WriteString("\", \"")
+		f.WriteString(link.SrcLinkPath.Category)
 		f.WriteString("\", \"")
 		f.WriteString(link.SrcLinkPath.ExcelName)
 		f.WriteString("\", \"")

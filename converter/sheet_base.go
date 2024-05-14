@@ -60,6 +60,10 @@ func (s *SheetBase) IndirectName() string {
 	return name
 }
 
+func (s *SheetBase) Category() string {
+	return s.Excel().Category()
+}
+
 func (s *SheetBase) GetSection(name SectionType) Section {
 	if section, ok := s.sectionMap[name]; ok {
 		return section
