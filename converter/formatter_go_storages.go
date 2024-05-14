@@ -1,12 +1,12 @@
 package converter
 
-type FormatterGoStorage struct {
+type FormatterGoStorages struct {
 	*FormatterBase
 	exelMap map[string]map[string]bool
 }
 
-func NewFormatterGoStorage() *FormatterGoStorage {
-	f := &FormatterGoStorage{
+func NewFormatterGoStorages() *FormatterGoStorages {
+	f := &FormatterGoStorages{
 		FormatterBase: NewFormatterBase(),
 		exelMap:       make(map[string]map[string]bool),
 	}
@@ -17,16 +17,41 @@ package storage
 	return f
 }
 
-func (f *FormatterGoStorage) Close() string {
+func (f *FormatterGoStorages) Close() string {
+	return f.String()
+}
+
+func (f *FormatterGoStorages) FormatPackage(packageNames []string) {
+	f.WriteString("import (\n")
+	f.WriteString("\t\"encoding/json\"\n")
+	for _, packageName := range packageNames {
+		f.WriteString("\t\"")
+		f.WriteString(path.ImportPath() + "/")
+		goPackageName := format.ToGoPackageCase(packageName)
+		f.WriteString(goPackageName)
+		f.WriteString("\"\n")
+	}
+	f.WriteString("\t\"strings\"\n")
+	f.WriteString(")\n")
+}
+
+func (f *FormatterGoStorages) FormatVars() {
 	f.WriteString(`
-func Set(packageName, excelName, sheetName string, v interface{}) {
+var Storage = make(map[string]map[string]map[string]any)
+var OriginStorage = make(map[string]map[string]map[string]any)
+`)
+}
+
+func (f *FormatterGoStorages) FormatFuncs() {
+	f.WriteString(`
+func Set(packageName, excelName, sheetName string, v any) {
 	if _, ok := Storage[packageName]; !ok {
-		Storage[packageName] = make(map[string]map[string]interface{})
-		OriginStorage[packageName] = make(map[string]map[string]interface{})
+		Storage[packageName] = make(map[string]map[string]any)
+		OriginStorage[packageName] = make(map[string]map[string]any)
 	}
 	if _, ok := Storage[packageName][excelName]; !ok {
-		Storage[packageName][excelName] = make(map[string]interface{})
-		OriginStorage[packageName][excelName] = make(map[string]interface{})
+		Storage[packageName][excelName] = make(map[string]any)
+		OriginStorage[packageName][excelName] = make(map[string]any)
 	}
 	Storage[packageName][excelName][sheetName] = v
 	OriginStorage[packageName][excelName][sheetName] = v
@@ -57,7 +82,7 @@ func Has(packageName, excelName, sheetName string) bool {
 	return true
 }
 
-func Find(packageName, excelName, sheetName string) interface{} {
+func Find(packageName, excelName, sheetName string) any {
 	for {
 		if packageName == "" {
 			return nil
@@ -74,7 +99,7 @@ func Link(dstCategory, dstExcelName, dstSheetName,srcCategory, srcExcelName, src
 	Set(dstCategory, dstExcelName, dstSheetName, Find(srcCategory, srcExcelName, srcSheetName))
 }
 
-func Load(dataMap map[string]string, name string, v interface{}) {
+func Load(dataMap map[string]string, name string, v any) {
 	if _, ok := dataMap[name]; !ok {
 		return
 	}
@@ -82,41 +107,10 @@ func Load(dataMap map[string]string, name string, v interface{}) {
 		panic(err)
 	}
 }
-
-`)
-	return f.String()
-}
-
-func (f *FormatterGoStorage) FormatPackage(packageNames []string) {
-	f.WriteString("import (\n")
-	f.WriteString("\t\"encoding/json\"\n")
-	for _, packageName := range packageNames {
-		f.WriteString("\t\"")
-		f.WriteString(path.ImportPath() + "/")
-		goPackageName := format.ToGoPackageCase(packageName)
-		f.WriteString(goPackageName)
-		f.WriteString("\"\n")
-	}
-	f.WriteString("\t\"strings\"\n")
-	f.WriteString(")\n")
-	f.WriteString(`
-var Storage = make(map[string]map[string]map[string]interface{})
-var OriginStorage = make(map[string]map[string]map[string]interface{})
-
 `)
 }
 
-func (f *FormatterGoStorage) FormatCategories(categories []string) {
-	f.WriteString("var Categories = []string{\n")
-	for _, category := range categories {
-		f.WriteString("\t\"")
-		f.WriteString(category)
-		f.WriteString("\",\n")
-	}
-	f.WriteString("}\n")
-}
-
-func (f *FormatterGoStorage) FormatStorages(storages []*Storage) {
+func (f *FormatterGoStorages) FormatStorages(storages []*Storage) {
 	f.WriteString(`
 func StoragesLoading(data map[string]string) {
 `)
@@ -154,11 +148,7 @@ func StoragesMapping() {
 	f.WriteString("}\n")
 }
 
-func (f *FormatterGoStorage) StoragesLoading(storages []*Storage) {
-
-}
-
-func (f *FormatterGoStorage) FormatLinks(links []*Link) {
+func (f *FormatterGoStorages) FormatLinks(links []*Link) {
 	f.WriteString(`
 func LinksMapping() {
 `)
@@ -180,7 +170,7 @@ func LinksMapping() {
 	f.WriteString("}\n")
 }
 
-func (f *FormatterGoStorage) FormatCategoryLinks() {
+func (f *FormatterGoStorages) FormatCategoryLinks() {
 	f.WriteString(`
 func CategoriesMapping() {
 	for _, dstCategory := range Categories {

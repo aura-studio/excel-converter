@@ -139,6 +139,8 @@ func (c *ConverterGo) FormatStructs() {
 func (c *ConverterGo) FormatStorage() {
 	formatter := NewFormatterGoStorage()
 	formatter.FormatPackage(c.collection.PackageNames())
+	formatter.FormatVars()
+	formatter.FormatFuncs()
 	formatter.FormatCategories(c.collection.Categories())
 	formatter.FormatStorages(c.collection.Storages())
 	formatter.FormatLinks(c.collection.Links())
