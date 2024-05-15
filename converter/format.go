@@ -151,12 +151,12 @@ func (f Format) ToExcelIndex(col string) int {
 	return index
 }
 
-func (f Format) ParseRange(content string) []interface{} {
+func (f Format) ParseRange(content string) []any {
 	if content == "" {
 		return nil
 	}
 	contents := strings.Split(content, FlagComma)
-	var keys []interface{}
+	var keys []any
 	for _, content := range contents {
 		content = strings.Trim(content, " ")
 		if content == "" {

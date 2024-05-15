@@ -37,8 +37,8 @@ func (c *ConverterLua) Format() {
 	c.ForeachDomain(func(domain Domain) {
 		domains = append(domains, domain)
 	})
-	results := c.Parallel(ToSlice(domains), func(param interface{}) func() interface{} {
-		return func() interface{} {
+	results := c.Parallel(ToSlice(domains), func(param any) func() any {
+		return func() any {
 			domain := param.(Domain)
 			formatter := NewFormatterLua()
 			for _, excel := range domain[ExcelTypeRegular] {

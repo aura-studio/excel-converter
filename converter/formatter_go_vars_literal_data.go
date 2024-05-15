@@ -9,15 +9,15 @@ import (
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
 )
 
-type FormatterGoData struct {
+type FormatterGoVarsLiteralData struct {
 	*FormatterBase
 	used        bool
 	packageName string
 	identifier  *Identifier
 }
 
-func NewFormatterGoData(packageName string, identifier *Identifier) *FormatterGoData {
-	f := &FormatterGoData{
+func NewFormatterGoLiteralData(packageName string, identifier *Identifier) *FormatterGoVarsLiteralData {
+	f := &FormatterGoVarsLiteralData{
 		FormatterBase: NewFormatterBase(),
 		packageName:   packageName,
 		identifier:    identifier,
@@ -37,15 +37,7 @@ func init() {
 	return f
 }
 
-func (f *FormatterGoData) Close() string {
-	if !f.used {
-		return ""
-	}
-	f.WriteString("}")
-	return f.String()
-}
-
-func (f *FormatterGoData) FormatNode(node Node) {
+func (f *FormatterGoVarsLiteralData) FormatNode(node Node) {
 	f.used = true
 	sheetName := node.InferiorSheetName()
 	excel := node.Excel()
@@ -60,15 +52,15 @@ func (f *FormatterGoData) FormatNode(node Node) {
 	f.WriteString("\n\n")
 }
 
-func (f *FormatterGoData) FormatVarName(node Node) {
+func (f *FormatterGoVarsLiteralData) FormatVarName(node Node) {
 	f.WriteString(node.RootName())
 }
 
-func (f *FormatterGoData) FormatFieldName(node Node) {
+func (f *FormatterGoVarsLiteralData) FormatFieldName(node Node) {
 	f.WriteString(format.ToUpper(node.FieldName()))
 }
 
-func (f *FormatterGoData) FormatValue(node Node, source Source, parentNode Node) {
+func (f *FormatterGoVarsLiteralData) FormatValue(node Node, source Source, parentNode Node) {
 	switch node.Type() {
 	case NodeTypeSimple:
 		f.FormatBase(node, []Source{source})
@@ -90,7 +82,7 @@ func (f *FormatterGoData) FormatValue(node Node, source Source, parentNode Node)
 	}
 }
 
-func (f *FormatterGoData) FormatBase(node Node, sources []Source) {
+func (f *FormatterGoVarsLiteralData) FormatBase(node Node, sources []Source) {
 	source := sources[0]
 	switch node.Field().Structure {
 	case StructureTypeString:
@@ -162,7 +154,7 @@ func (f *FormatterGoData) FormatBase(node Node, sources []Source) {
 	}
 }
 
-func (f *FormatterGoData) FormatSlice(node Node, sources []Source) {
+func (f *FormatterGoVarsLiteralData) FormatSlice(node Node, sources []Source) {
 	nodeSub := node.Nodes()[0]
 	if nodeSub.Type() == NodeTypeSimple {
 		f.WriteString("{")
@@ -190,7 +182,7 @@ func (f *FormatterGoData) FormatSlice(node Node, sources []Source) {
 	}
 }
 
-func (f *FormatterGoData) FormatMap(node Node, sources []Source) {
+func (f *FormatterGoVarsLiteralData) FormatMap(node Node, sources []Source) {
 	nodes := node.Nodes()
 	nodeKey := nodes[0]
 	nodeVal := nodes[1]
@@ -210,7 +202,7 @@ func (f *FormatterGoData) FormatMap(node Node, sources []Source) {
 	f.WriteString("}")
 }
 
-func (f *FormatterGoData) FormatStruct(node Node, sources []Source) {
+func (f *FormatterGoVarsLiteralData) FormatStruct(node Node, sources []Source) {
 	nodes := node.Nodes()
 	sources = sources[0].Sources()
 	f.WriteString("{\n")
@@ -229,4 +221,12 @@ func (f *FormatterGoData) FormatStruct(node Node, sources []Source) {
 	f.DecDepth()
 	f.FormatIndent()
 	f.WriteString("}")
+}
+
+func (f *FormatterGoVarsLiteralData) Close() string {
+	if !f.used {
+		return ""
+	}
+	f.WriteString("}")
+	return f.String()
 }

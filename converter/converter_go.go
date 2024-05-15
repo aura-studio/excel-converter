@@ -120,10 +120,15 @@ func (c *ConverterGo) Link() {
 }
 
 func (c *ConverterGo) Format() {
-	c.FormatLiteralData()
-	c.FormatJSONData()
-	c.FormatVar()
+	c.FormatVarsLiteralData()
+	c.FormatVarsJSONData()
+	c.FormatVars()
 	c.FormatStructs()
+	c.FormatStorageTypes()
+	c.FormatStorageVars()
+	c.FormatStorageStorages()
+	c.FormatStorageLinks()
+	c.FormatStorageCategories()
 	c.FormatStorage()
 }
 
@@ -131,34 +136,100 @@ func (c *ConverterGo) FormatStructs() {
 	formatter := NewFormatterGoStructs(c.identifier)
 	formatter.FormatStruct()
 	formatter.FormatStructEqual()
-	filePath := c.GetStructsPath()
 	content := formatter.Close()
+	filePath := filepath.Join(path.ExportAbsPath(), "structs", "structs.go")
+	c.contentMap[filePath] = content
+}
+
+func (c *ConverterGo) FormatStorageVars() {
+	formatter := NewFormatterGoStorageDynamics(c.collection.PackageNames(), c.collection.Storages())
+	formatter.FormatPackages()
+	formatter.FormatVars()
+	formatter.FormatFuncs()
+	formatter.FormatLoading()
+	content := formatter.Close()
+	filePath := filepath.Join(path.ExportAbsPath(), "storage", "dynamics.go")
+	c.contentMap[filePath] = content
+}
+
+func (c *ConverterGo) FormatStorageStorages() {
+	formatter := NewFormatterGoStorageStatics(c.collection.PackageNames(), c.collection.Storages())
+	formatter.FormatPackages()
+	formatter.FormatVars()
+	formatter.FormatFuncs()
+	formatter.FormatLoading()
+	content := formatter.Close()
+	filePath := filepath.Join(path.ExportAbsPath(), "storage", "statics.go")
+	c.contentMap[filePath] = content
+}
+
+func (c *ConverterGo) FormatStorageLinks() {
+	formatter := NewFormatterGoStorageLinks(c.collection.Links())
+	formatter.FormatPackages()
+	formatter.FormatVars()
+	formatter.FormatFuncs()
+	formatter.FormatLoading()
+	content := formatter.Close()
+	filePath := filepath.Join(path.ExportAbsPath(), "storage", "links.go")
+	c.contentMap[filePath] = content
+}
+
+func (c *ConverterGo) FormatStorageCategories() {
+	formatter := NewFormatterGoStorageCategories(c.collection.Categories())
+	formatter.FormatPackages()
+	formatter.FormatFuncs()
+	formatter.FormatLoading()
+	content := formatter.Close()
+	filePath := filepath.Join(path.ExportAbsPath(), "storage", "categories.go")
 	c.contentMap[filePath] = content
 }
 
 func (c *ConverterGo) FormatStorage() {
 	formatter := NewFormatterGoStorage()
-	formatter.FormatPackage(c.collection.PackageNames())
+	formatter.FormatPackages()
 	formatter.FormatVars()
 	formatter.FormatFuncs()
-	formatter.FormatCategories(c.collection.Categories())
-	formatter.FormatStorages(c.collection.Storages())
-	formatter.FormatLinks(c.collection.Links())
-	formatter.FormatCategoryLinks()
+	formatter.FormatLoading()
 	content := formatter.Close()
-	filePath := c.GetStoragePath()
+	filePath := filepath.Join(path.ExportAbsPath(), "storage", "storage.go")
 	c.contentMap[filePath] = content
 }
 
-func (c *ConverterGo) FormatLiteralData() {
+func (c *ConverterGo) FormatStorageTypes() {
+	formatter := NewFormatterGoStorageTypes(c.identifier)
+	formatter.FormatPackages()
+	formatter.FormatVars()
+	formatter.FormatFuncs()
+	var nodes = []Node{}
+	for _, domain := range c.excelMap[FlagBase] {
+		for _, excel := range domain[ExcelTypeRegular] {
+			for _, node := range excel.Nodes() {
+				if node.Excel().ForServer() && node.Sheet().ForServer() {
+					nodes = append(nodes, node)
+				}
+			}
+		}
+	}
+	sort.Slice(nodes, func(i, j int) bool {
+		return nodes[i].String() < nodes[j].String()
+	})
+	for _, node := range nodes {
+		formatter.FormatNode(node)
+	}
+	content := formatter.Close()
+	filePath := filepath.Join(path.ExportAbsPath(), "storage", "types.go")
+	c.contentMap[filePath] = content
+}
+
+func (c *ConverterGo) FormatVarsLiteralData() {
 	domains := make([]Domain, 0)
 	c.ForeachDomain(func(domain Domain) {
 		domains = append(domains, domain)
 	})
-	results := c.Parallel(ToSlice(domains), func(param interface{}) func() interface{} {
-		return func() interface{} {
+	results := c.Parallel(ToSlice(domains), func(param any) func() any {
+		return func() any {
 			domain := param.(Domain)
-			formatter := NewFormatterGoData(c.GetPackageName(domain), c.identifier)
+			formatter := NewFormatterGoLiteralData(c.GetPackageName(domain), c.identifier)
 			for _, excel := range domain[ExcelTypeRegular] {
 				for _, node := range excel.Nodes() {
 					if node.Excel().ForServer() && node.Sheet().ForServer() {
@@ -183,15 +254,15 @@ func (c *ConverterGo) FormatLiteralData() {
 	}
 }
 
-func (c *ConverterGo) FormatJSONData() {
+func (c *ConverterGo) FormatVarsJSONData() {
 	domains := make([]Domain, 0)
 	c.ForeachDomain(func(domain Domain) {
 		domains = append(domains, domain)
 	})
-	results := c.Parallel(ToSlice(domains), func(param interface{}) func() interface{} {
-		return func() interface{} {
+	results := c.Parallel(ToSlice(domains), func(param any) func() any {
+		return func() any {
 			domain := param.(Domain)
-			formatter := NewFormatterGoJSONData(c.GetPackageName(domain), c.identifier)
+			formatter := NewFormatterGoVarsJSONData(c.GetPackageName(domain), c.identifier)
 			for _, excel := range domain[ExcelTypeRegular] {
 				for _, node := range excel.Nodes() {
 					if node.Excel().ForServer() && node.Sheet().ForServer() {
@@ -216,13 +287,13 @@ func (c *ConverterGo) FormatJSONData() {
 	}
 }
 
-func (c *ConverterGo) FormatVar() {
+func (c *ConverterGo) FormatVars() {
 	packageNames := make([]string, 0)
 	for packageName := range c.excelMap {
 		packageNames = append(packageNames, packageName)
 	}
-	results := c.Parallel(ToSlice(packageNames), func(param interface{}) func() interface{} {
-		return func() interface{} {
+	results := c.Parallel(ToSlice(packageNames), func(param any) func() any {
+		return func() any {
 			packageName := param.(string)
 			formatter := NewFormatterGoVar(format.ToGoPackageCase(packageName), c.identifier)
 			var nodes = []Node{}
@@ -235,15 +306,12 @@ func (c *ConverterGo) FormatVar() {
 					}
 				}
 			}
-
 			sort.Slice(nodes, func(i, j int) bool {
 				return nodes[i].String() < nodes[j].String()
 			})
-
 			for _, node := range nodes {
 				formatter.FormatNode(node)
 			}
-
 			content := formatter.Close()
 			if len(content) == 0 {
 				return nil
@@ -266,7 +334,7 @@ func (c *ConverterGo) GetLiteralDataPath(domain Domain) string {
 		for _, excel := range excels {
 			goPackageName := format.ToGoPackageCase(excel.PackageName())
 			fileName := fmt.Sprintf("literal_%s.go", format.ToLower(excel.DomainName()))
-			return filepath.Join(path.ExportAbsPath(), goPackageName, fileName)
+			return filepath.Join(path.ExportAbsPath(), "vars", goPackageName, fileName)
 		}
 	}
 	Exit("[Main] Cannot find excel in domain")
@@ -278,7 +346,7 @@ func (c *ConverterGo) GetJSONDataPath(domain Domain) string {
 		for _, excel := range excels {
 			goPackageName := format.ToGoPackageCase(excel.PackageName())
 			fileName := fmt.Sprintf("json_%s.go", format.ToLower(excel.DomainName()))
-			return filepath.Join(path.ExportAbsPath(), goPackageName, fileName)
+			return filepath.Join(path.ExportAbsPath(), "vars", goPackageName, fileName)
 		}
 	}
 	Exit("[Main] Cannot find excel in domain")
@@ -290,21 +358,13 @@ func (c *ConverterGo) GetVarPath(packageName string) string {
 		for _, excels := range domain {
 			for _, excel := range excels {
 				goPackageName := format.ToGoPackageCase(excel.PackageName())
-				return filepath.Join(path.ExportAbsPath(), goPackageName, "var.go")
+				return filepath.Join(path.ExportAbsPath(), "vars", goPackageName, "vars.go")
 			}
 		}
 	}
 
 	Exit("[Main] Cannot find excel in package")
 	return ""
-}
-
-func (c *ConverterGo) GetStructsPath() string {
-	return filepath.Join(path.ExportAbsPath(), "structs", "structs.go")
-}
-
-func (c *ConverterGo) GetStoragePath() string {
-	return filepath.Join(path.ExportAbsPath(), "storage", "storage.go")
 }
 
 func (c *ConverterGo) GetPackageName(domain Domain) string {

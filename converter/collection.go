@@ -84,6 +84,11 @@ func (l *Collection) Storages() []*Storage {
 		})
 	}
 	sort.Slice(storages, func(i, j int) bool {
+		if storages[i].StoragePath.PackageName == FlagBase && storages[j].StoragePath.PackageName != FlagBase {
+			return true
+		} else if storages[i].StoragePath.PackageName != FlagBase && storages[j].StoragePath.PackageName == FlagBase {
+			return false
+		}
 		return storages[i].StoragePath.String() < storages[j].StoragePath.String()
 	})
 	return storages

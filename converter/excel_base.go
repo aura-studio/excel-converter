@@ -140,7 +140,7 @@ func (e *ExcelBase) GetHeaderSize(sheetName string) int {
 	return sheet.HeaderSize()
 }
 
-func (e *ExcelBase) GetHeaderField(sheetName string, key interface{}) HeaderField {
+func (e *ExcelBase) GetHeaderField(sheetName string, key any) HeaderField {
 	sheet := e.GetSheet(sheetName)
 	return sheet.GetHeaderField(key)
 }

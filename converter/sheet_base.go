@@ -87,7 +87,7 @@ func (s *SheetBase) VerticleSize() int {
 	return s.GetContentSection().Size()
 }
 
-func (s *SheetBase) GetHeaderField(key interface{}) HeaderField {
+func (s *SheetBase) GetHeaderField(key any) HeaderField {
 	header := s.GetSection(SectionTypeHeader).(*SectionHeader)
 	return header.GetHeaderField(key)
 }
@@ -109,7 +109,7 @@ func (s *SheetBase) GetContentSection() Section {
 	return s.GetSection(s.contentType)
 }
 
-func (s *SheetBase) GetContentKeyIndex(key interface{}) (int, bool) {
+func (s *SheetBase) GetContentKeyIndex(key any) (int, bool) {
 	if str, ok := key.(string); ok {
 		if str, ok := format.ParseContentKey(str); ok {
 			contents := s.GetVerticle(0)
@@ -124,7 +124,7 @@ func (s *SheetBase) GetContentKeyIndex(key interface{}) (int, bool) {
 	return 0, false
 }
 
-func (s *SheetBase) GetIndex(key interface{}) int {
+func (s *SheetBase) GetIndex(key any) int {
 	if index, ok := s.GetContentKeyIndex(key); ok {
 		return index
 	}

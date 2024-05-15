@@ -11,13 +11,13 @@ import (
 	"strings"
 )
 
-func Debug(s string, args ...interface{}) {
+func Debug(s string, args ...any) {
 	if debugMode {
 		log.Printf(s, args...)
 	}
 }
 
-func Exit(v interface{}, args ...interface{}) {
+func Exit(v any, args ...any) {
 	switch v := v.(type) {
 	case error:
 		err := v
@@ -59,8 +59,8 @@ func Exit(v interface{}, args ...interface{}) {
 	}
 }
 
-func ToSlice(arr interface{}) []interface{} {
-	ret := make([]interface{}, 0)
+func ToSlice(arr any) []any {
+	ret := make([]any, 0)
 	v := reflect.ValueOf(arr)
 	if v.Kind() != reflect.Slice {
 		ret = append(ret, arr)

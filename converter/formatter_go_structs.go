@@ -64,20 +64,9 @@ type (
 	return f
 }
 
-func (f *FormatterGoStructs) Close() string {
-	if !f.used {
-		return ""
-	}
-	f.WriteString(")")
-	return f.String()
-}
-
 func (f *FormatterGoStructs) FormatStruct() {
 	f.used = true
 	for _, node := range f.identifier.OriginNodes {
-		f.WriteString("\t// ")
-		f.WriteString(f.identifier.NodeStructMap[node.ID()])
-		f.WriteString(" comment\n")
 		f.WriteString("\t")
 		f.WriteString(f.identifier.NodeStructMap[node.ID()])
 		f.WriteString(" struct {\n")
@@ -95,14 +84,18 @@ func (f *FormatterGoStructs) FormatStruct() {
 func (f *FormatterGoStructs) FormatStructEqual() {
 	f.used = true
 	for _, structNames := range f.identifier.StructEquals {
-		f.WriteString("\t// ")
-		f.WriteString(structNames[0])
-		f.WriteString(" comment\n")
 		f.WriteString("\t")
 		f.WriteString(structNames[0])
 		f.WriteString(" = ")
 		f.WriteString(structNames[1])
 		f.WriteString("\n")
-		f.WriteString("\n")
 	}
+}
+
+func (f *FormatterGoStructs) Close() string {
+	if !f.used {
+		return ""
+	}
+	f.WriteString(")")
+	return f.String()
 }

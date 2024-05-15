@@ -59,7 +59,7 @@ func init() {
 	}
 }
 
-func NewNode(ctx *NodeContext, sheet Sheet, v interface{}) Node {
+func NewNode(ctx *NodeContext, sheet Sheet, v any) Node {
 	var nodeType NodeType
 	var field *Field
 	switch v := v.(type) {

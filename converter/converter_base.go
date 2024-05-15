@@ -14,7 +14,7 @@ import (
 
 type Domain map[ExcelType][]Excel
 
-type Task func() interface{}
+type Task func() any
 
 type ConverterBase struct {
 	typ        ConverterType
@@ -44,9 +44,9 @@ func (c *ConverterBase) RelPath() string {
 }
 
 func (c *ConverterBase) Parallel(
-	params []interface{},
-	generator func(interface{}) func() interface{},
-) (results []interface{}) {
+	params []any,
+	generator func(any) func() any,
+) (results []any) {
 	var tasks = make([]Task, 0, len(params))
 	for _, param := range params {
 		tasks = append(tasks, generator(param))
@@ -170,8 +170,8 @@ func (c *ConverterBase) Read() {
 	c.ForeachExcel(func(excel Excel) {
 		excels = append(excels, excel)
 	})
-	c.Parallel(ToSlice(excels), func(param interface{}) func() interface{} {
-		return func() interface{} {
+	c.Parallel(ToSlice(excels), func(param any) func() any {
+		return func() any {
 			excel := param.(Excel)
 			excel.Read()
 			return nil
@@ -180,12 +180,12 @@ func (c *ConverterBase) Read() {
 }
 
 func (c *ConverterBase) Write() {
-	var absPaths = make([]interface{}, 0, len(c.contentMap))
+	var absPaths = make([]any, 0, len(c.contentMap))
 	for absPath := range c.contentMap {
 		absPaths = append(absPaths, absPath)
 	}
-	c.Parallel(absPaths, func(param interface{}) func() interface{} {
-		return func() interface{} {
+	c.Parallel(absPaths, func(param any) func() any {
+		return func() any {
 			absPath := param.(string)
 			content := c.contentMap[absPath]
 			Debug("[%v] write %d bytes", absPath, len(content))
@@ -238,8 +238,8 @@ func (c *ConverterBase) Preprocess() {
 	c.ForeachExcel(func(excel Excel) {
 		excels = append(excels, excel)
 	})
-	c.Parallel(ToSlice(excels), func(param interface{}) func() interface{} {
-		return func() interface{} {
+	c.Parallel(ToSlice(excels), func(param any) func() any {
+		return func() any {
 			excel := param.(Excel)
 			excel.Preprocess()
 			return nil
@@ -258,8 +258,8 @@ func (c *ConverterBase) Build() {
 			excels = append(excels, excel)
 		}
 	})
-	c.Parallel(ToSlice(excels), func(param interface{}) func() interface{} {
-		return func() interface{} {
+	c.Parallel(ToSlice(excels), func(param any) func() any {
+		return func() any {
 			excel := param.(Excel)
 			excel.Build()
 			return nil

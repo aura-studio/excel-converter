@@ -5,15 +5,15 @@ import (
 	"strconv"
 )
 
-type FormatterGoJSONData struct {
+type FormatterGoVarsJSONData struct {
 	*FormatterBase
 	used        bool
 	packageName string
 	identifier  *Identifier
 }
 
-func NewFormatterGoJSONData(packageName string, identifier *Identifier) *FormatterGoJSONData {
-	f := &FormatterGoJSONData{
+func NewFormatterGoVarsJSONData(packageName string, identifier *Identifier) *FormatterGoVarsJSONData {
+	f := &FormatterGoVarsJSONData{
 		FormatterBase: NewFormatterBase(),
 		packageName:   packageName,
 		identifier:    identifier,
@@ -38,15 +38,7 @@ func init() {
 	return f
 }
 
-func (f *FormatterGoJSONData) Close() string {
-	if !f.used {
-		return ""
-	}
-	f.WriteString("}")
-	return f.String()
-}
-
-func (f *FormatterGoJSONData) FormatNode(node Node) {
+func (f *FormatterGoVarsJSONData) FormatNode(node Node) {
 	f.used = true
 	sheetName := node.InferiorSheetName()
 	excel := node.Excel()
@@ -66,17 +58,17 @@ func (f *FormatterGoJSONData) FormatNode(node Node) {
 	f.WriteString("\n\n")
 }
 
-func (f *FormatterGoJSONData) FormatVarName(node Node) {
+func (f *FormatterGoVarsJSONData) FormatVarName(node Node) {
 	f.WriteString(node.RootName())
 }
 
-func (f *FormatterGoJSONData) FormatFieldName(node Node) {
+func (f *FormatterGoVarsJSONData) FormatFieldName(node Node) {
 	f.WriteString("\"")
 	f.WriteString(format.ToUpper(node.FieldName()))
 	f.WriteString("\"")
 }
 
-func (f *FormatterGoJSONData) FormatValue(node Node, source Source, parentNode Node) {
+func (f *FormatterGoVarsJSONData) FormatValue(node Node, source Source, parentNode Node) {
 	switch node.Type() {
 	case NodeTypeSimple:
 		f.FormatBase(node, []Source{source})
@@ -91,7 +83,7 @@ func (f *FormatterGoJSONData) FormatValue(node Node, source Source, parentNode N
 	}
 }
 
-func (f *FormatterGoJSONData) FormatBase(node Node, sources []Source) {
+func (f *FormatterGoVarsJSONData) FormatBase(node Node, sources []Source) {
 	source := sources[0]
 	switch node.Field().Structure {
 	case StructureTypeString:
@@ -125,7 +117,7 @@ func (f *FormatterGoJSONData) FormatBase(node Node, sources []Source) {
 	}
 }
 
-func (f *FormatterGoJSONData) FormatFieldBase(node Node, sources []Source) {
+func (f *FormatterGoVarsJSONData) FormatFieldBase(node Node, sources []Source) {
 	source := sources[0]
 	switch node.Field().Structure {
 	case StructureTypeString:
@@ -171,7 +163,7 @@ func (f *FormatterGoJSONData) FormatFieldBase(node Node, sources []Source) {
 	}
 }
 
-func (f *FormatterGoJSONData) FormatSlice(node Node, sources []Source) {
+func (f *FormatterGoVarsJSONData) FormatSlice(node Node, sources []Source) {
 	nodeSub := node.Nodes()[0]
 	if nodeSub.Type() == NodeTypeSimple {
 		f.WriteString("[")
@@ -208,7 +200,7 @@ func (f *FormatterGoJSONData) FormatSlice(node Node, sources []Source) {
 	}
 }
 
-func (f *FormatterGoJSONData) FormatMap(node Node, sources []Source) {
+func (f *FormatterGoVarsJSONData) FormatMap(node Node, sources []Source) {
 	nodes := node.Nodes()
 	nodeKey := nodes[0]
 	nodeVal := nodes[1]
@@ -232,7 +224,7 @@ func (f *FormatterGoJSONData) FormatMap(node Node, sources []Source) {
 	f.WriteString("}")
 }
 
-func (f *FormatterGoJSONData) FormatStruct(node Node, sources []Source) {
+func (f *FormatterGoVarsJSONData) FormatStruct(node Node, sources []Source) {
 	nodes := node.Nodes()
 	sources = sources[0].Sources()
 	f.WriteString("{\n")
@@ -264,4 +256,12 @@ func (f *FormatterGoJSONData) FormatStruct(node Node, sources []Source) {
 	f.DecDepth()
 	f.FormatIndent()
 	f.WriteString("}")
+}
+
+func (f *FormatterGoVarsJSONData) Close() string {
+	if !f.used {
+		return ""
+	}
+	f.WriteString("}")
+	return f.String()
 }

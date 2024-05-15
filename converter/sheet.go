@@ -19,11 +19,11 @@ type Sheet interface {
 	IndirectName() string
 	HeaderSize() int
 	VerticleSize() int
-	GetHeaderField(interface{}) HeaderField
+	GetHeaderField(any) HeaderField
 	GetHorizon(int) []string
 	GetVerticle(int) []string
 	GetCell(HeaderField, int) string
-	GetIndex(interface{}) int
+	GetIndex(any) int
 	ParseContent(StructureType)
 	FormatHeader(FieldType)
 	FormatContent()

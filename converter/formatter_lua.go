@@ -24,14 +24,6 @@ local _ = {}
 	return f
 }
 
-func (f *FormatterLua) Close() string {
-	if !f.used {
-		return ""
-	}
-	f.WriteString(`return _`)
-	return f.String()
-}
-
 func (f *FormatterLua) FormatNode(node Node) {
 	f.used = true
 	sheetName := node.InferiorSheetName()
@@ -221,4 +213,12 @@ func (f *FormatterLua) FormatStruct(node Node, sources []Source) {
 	f.DecDepth()
 	f.FormatIndent()
 	f.WriteString("}")
+}
+
+func (f *FormatterLua) Close() string {
+	if !f.used {
+		return ""
+	}
+	f.WriteString(`return _`)
+	return f.String()
 }

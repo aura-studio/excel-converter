@@ -18,7 +18,7 @@ type Section interface {
 	GetHorizon(int, []int) []string
 	GetVertical(int, []int) []string
 	Format(int)
-	GetIndex(interface{}) int
+	GetIndex(any) int
 }
 
 var sectionCreators map[SectionType]func(Sheet) Section

@@ -9,17 +9,17 @@ import (
 type SectionBase struct {
 	sheet    Sheet
 	data     [][]string
-	indexMap map[interface{}]int // key: int or string, val: index
+	indexMap map[any]int // key: int or string, val: index
 }
 
 func NewSectionBase(sheet Sheet) *SectionBase {
 	return &SectionBase{
 		sheet:    sheet,
-		indexMap: make(map[interface{}]int),
+		indexMap: make(map[any]int),
 	}
 }
 
-func (s *SectionBase) GetIndex(key interface{}) int {
+func (s *SectionBase) GetIndex(key any) int {
 	var indexKey = key
 	if n, err := cast.ToIntE(key); err == nil {
 		indexKey = n
@@ -33,7 +33,7 @@ func (s *SectionBase) GetIndex(key interface{}) int {
 
 func (s *SectionBase) Append(index int, data []string) {
 	s.data = append(s.data, data)
-	keys := []interface{}{
+	keys := []any{
 		index + 1,
 		cast.ToString(index + 1),
 		format.ToExcelCol(index + 1),
@@ -153,7 +153,7 @@ func (s *SectionBase) Rotate() {
 	}
 	s.data = data
 
-	lineMap := make(map[interface{}]int)
+	lineMap := make(map[any]int)
 	for _, index := range s.indexMap {
 		lineMap[index+1] = index
 		lineMap[format.ToExcelCol(index+1)] = index

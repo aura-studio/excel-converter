@@ -27,7 +27,7 @@ type Field struct {
 	Key       bool
 }
 
-func NewField(sheet Sheet, v interface{}) *Field {
+func NewField(sheet Sheet, v any) *Field {
 	f := &Field{}
 	f.Sheet = sheet
 	switch v := v.(type) {

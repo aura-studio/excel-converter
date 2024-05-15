@@ -1,65 +1,75 @@
 package converter
 
-import (
-	"fmt"
-)
+import "fmt"
 
-type FormatterGoVar struct {
+type FormatterGoStorageTypes struct {
 	*FormatterBase
-	used        bool
-	packageName string
-	identifier  *Identifier
+	identifier *Identifier
 }
 
-func NewFormatterGoVar(packageName string, identifier *Identifier) *FormatterGoVar {
-	f := &FormatterGoVar{
+func NewFormatterGoStorageTypes(identifier *Identifier) *FormatterGoStorageTypes {
+	f := &FormatterGoStorageTypes{
 		FormatterBase: NewFormatterBase(),
-		packageName:   packageName,
 		identifier:    identifier,
 	}
-	f.WriteString(fmt.Sprintf(`// <important: auto generate by excel-to-go converter, do not modify>
-package %s
-
-import "%s/structs"
-
-var (
-`, packageName, path.ImportPath()))
-	f.IncDepth()
+	f.WriteString(`// <important: auto generate by excel-to-go converter, do not modify>
+package storage
+`)
 	return f
 }
 
-func (f *FormatterGoVar) Close() string {
-	if !f.used {
-		return ""
-	}
-	f.WriteString(")")
-	return f.String()
+func (f *FormatterGoStorageTypes) FormatPackages() {
+	f.WriteString("\nimport (\n")
+	f.WriteString("\t\"")
+	f.WriteString(path.ImportPath())
+	f.WriteString("/structs\"\n")
+	f.WriteString(")\n")
 }
 
-func (f *FormatterGoVar) FormatNode(node Node) {
-	f.used = true
+func (f *FormatterGoStorageTypes) FormatVars() {
+	f.WriteString(`
+var TypeStorage = make(map[string]map[string]any)
+`)
+}
+
+func (f *FormatterGoStorageTypes) FormatFuncs() {
+	f.WriteString(`
+func LoadType(excelName, sheetName string, v any) {
+	if _, ok := TypeStorage[excelName]; !ok {
+		TypeStorage[excelName] = make(map[string]any)
+	}
+	TypeStorage[excelName][sheetName] = v
+}
+
+func LoadTypes() {
+`)
+}
+
+func (f *FormatterGoStorageTypes) FormatNode(node Node) {
 	sheetName := node.InferiorSheetName()
 	excel := node.Excel()
 	sheet := excel.GetSheet(sheetName)
 	ctx := NewSourceContext()
 	ctx.key = node.Context().key
 	source := NewSourceTable(ctx, sheet, node.Field().Structure, nil)
-	f.WriteString("\t")
-	f.FormatVarName(node)
-	f.WriteString(" = ")
+	f.WriteString("\tLoadType(\"")
+	f.WriteString(node.ExcelPathName())
+	f.WriteString("\", \"")
+	f.WriteString(node.SheetPathName())
+	f.WriteString("\", ")
 	f.FormatValue(node, source, nil)
-	f.WriteString("\n")
+	f.WriteString(")\n")
 }
 
-func (f *FormatterGoVar) FormatVarName(node Node) {
+func (f *FormatterGoStorageTypes) FormatVarName(node Node) {
 	f.WriteString(node.RootName())
 }
 
-func (f *FormatterGoVar) FormatFieldName(node Node) {
+func (f *FormatterGoStorageTypes) FormatFieldName(node Node) {
 	f.WriteString(format.ToUpper(node.FieldName()))
 }
 
-func (f *FormatterGoVar) FormatValue(node Node, source Source, parentNode Node) {
+func (f *FormatterGoStorageTypes) FormatValue(node Node, source Source, parentNode Node) {
 	if source.Type() == SourceTypeNil {
 		return
 	}
@@ -83,7 +93,7 @@ func (f *FormatterGoVar) FormatValue(node Node, source Source, parentNode Node) 
 	}
 }
 
-func (f *FormatterGoVar) FormatBase(node Node, sources []Source) {
+func (f *FormatterGoStorageTypes) FormatBase(node Node, sources []Source) {
 	source := sources[0]
 	switch node.Field().Structure {
 	case StructureTypeString:
@@ -123,14 +133,19 @@ func (f *FormatterGoVar) FormatBase(node Node, sources []Source) {
 	}
 }
 
-func (f *FormatterGoVar) FormatSlice(node Node, sources []Source) {
+func (f *FormatterGoStorageTypes) FormatSlice(node Node, sources []Source) {
 	f.WriteString("{}")
 }
 
-func (f *FormatterGoVar) FormatMap(node Node, sources []Source) {
+func (f *FormatterGoStorageTypes) FormatMap(node Node, sources []Source) {
 	f.WriteString("{}")
 }
 
-func (f *FormatterGoVar) FormatStruct(node Node, sources []Source) {
+func (f *FormatterGoStorageTypes) FormatStruct(node Node, sources []Source) {
 	f.WriteString("{}")
+}
+
+func (f *FormatterGoStorageTypes) Close() string {
+	f.WriteString("}")
+	return f.String()
 }

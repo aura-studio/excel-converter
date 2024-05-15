@@ -23,7 +23,7 @@ type Excel interface {
 	Type() ExcelType
 	GetSheet(string) Sheet
 	GetHeaderSize(string) int
-	GetHeaderField(string, interface{}) HeaderField
+	GetHeaderField(string, any) HeaderField
 	Build()
 	Nodes() []Node
 	ForServer() bool

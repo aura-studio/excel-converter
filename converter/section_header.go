@@ -63,7 +63,7 @@ func (s *SectionHeader) OriginHeadeSize() int {
 	return len(s.data[0])
 }
 
-func (s *SectionHeader) GetHeaderField(key interface{}) HeaderField {
+func (s *SectionHeader) GetHeaderField(key any) HeaderField {
 	switch key := key.(type) {
 	case int:
 		index := key
