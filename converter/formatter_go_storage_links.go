@@ -51,6 +51,7 @@ func LoadLink(dstPackageName, dstExcelName, dstSheetName, srcPackageName, srcExc
 			Storage[dstPackageName][dstExcelName] = make(map[string]any)
 		}
 		Storage[dstPackageName][dstExcelName][dstSheetName] = v
+		return
 	}
 }
 `)
