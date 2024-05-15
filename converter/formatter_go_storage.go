@@ -45,8 +45,21 @@ func Parent(packageName string) string {
 	}
 }
 
-func CopyStorage() {
-	Storage = deepcopy.Copy(OriginStorage).(map[string]map[string]map[string]any)
+func LoadStorage() {
+	Storage = make(map[string]map[string]map[string]any)
+	for packageName, subStorage := range OriginStorage {
+		for excelName, excel := range subStorage {
+			for sheetName, sheet := range excel {
+				if _, ok := Storage[packageName]; !ok {
+					Storage[packageName] = make(map[string]map[string]any)
+				}
+				if _, ok := Storage[packageName][excelName]; !ok {
+					Storage[packageName][excelName] = make(map[string]any)
+				}
+				Storage[packageName][excelName][sheetName] = deepcopy.Copy(sheet)
+			}
+		}
+	}
 }
 `)
 }
@@ -55,7 +68,7 @@ func (f *FormatterGoStorage) FormatLoading() {
 	f.WriteString(`
 func init() {
 	LoadStatics()
-	CopyStorage()
+	LoadStorage()
 	LoadLinks()
 	LoadCategories()
 
@@ -65,7 +78,7 @@ func init() {
 
 func Load(data map[string]string) {
 	LoadDynamics(data)
-	CopyStorage()
+	LoadStorage()
 	LoadLinks()
 	LoadCategories()
 }
