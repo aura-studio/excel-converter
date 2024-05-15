@@ -45,21 +45,40 @@ func Parent(packageName string) string {
 	}
 }
 
-func LoadStorage() {
-	Storage = make(map[string]map[string]map[string]any)
+func ResetOriginStorage() {
+	storage := make(map[string]map[string]map[string]any)
 	for packageName, subStorage := range OriginStorage {
 		for excelName, excel := range subStorage {
 			for sheetName, sheet := range excel {
-				if _, ok := Storage[packageName]; !ok {
-					Storage[packageName] = make(map[string]map[string]any)
+				if _, ok := storage[packageName]; !ok {
+					storage[packageName] = make(map[string]map[string]any)
 				}
-				if _, ok := Storage[packageName][excelName]; !ok {
-					Storage[packageName][excelName] = make(map[string]any)
+				if _, ok := storage[packageName][excelName]; !ok {
+					storage[packageName][excelName] = make(map[string]any)
 				}
-				Storage[packageName][excelName][sheetName] = deepcopy.Copy(sheet)
+				storage[packageName][excelName][sheetName] = deepcopy.Copy(sheet)
 			}
 		}
 	}
+	OriginStorage = storage
+}
+
+func ResetStorage() {
+	storage := make(map[string]map[string]map[string]any)
+	for packageName, subStorage := range OriginStorage {
+		for excelName, excel := range subStorage {
+			for sheetName, sheet := range excel {
+				if _, ok := storage[packageName]; !ok {
+					storage[packageName] = make(map[string]map[string]any)
+				}
+				if _, ok := storage[packageName][excelName]; !ok {
+					storage[packageName][excelName] = make(map[string]any)
+				}
+				storage[packageName][excelName][sheetName] = deepcopy.Copy(sheet)
+			}
+		}
+	}
+	Storage = storage
 }
 `)
 }
@@ -67,8 +86,9 @@ func LoadStorage() {
 func (f *FormatterGoStorage) FormatLoading() {
 	f.WriteString(`
 func init() {
+	ResetOriginStorage()
 	LoadStatics()
-	LoadStorage()
+	ResetStorage()
 	LoadLinks()
 	LoadCategories()
 
@@ -77,8 +97,9 @@ func init() {
 }
 
 func Load(data map[string]string) {
+	ResetOriginStorage()
 	LoadDynamics(data)
-	LoadStorage()
+	ResetStorage()
 	LoadLinks()
 	LoadCategories()
 }
