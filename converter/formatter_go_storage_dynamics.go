@@ -2,15 +2,11 @@ package converter
 
 type FormatterGoStorageDynamics struct {
 	*FormatterBase
-	packageNames []string
-	storages     []*Storage
 }
 
-func NewFormatterGoStorageDynamics(packageNames []string, storages []*Storage) *FormatterGoStorageDynamics {
+func NewFormatterGoStorageDynamics() *FormatterGoStorageDynamics {
 	f := &FormatterGoStorageDynamics{
 		FormatterBase: NewFormatterBase(),
-		packageNames:  packageNames,
-		storages:      storages,
 	}
 	f.WriteString(`// <important: auto generate by excel-to-go converter, do not modify>
 package storage
@@ -36,14 +32,7 @@ func (f *FormatterGoStorageDynamics) FormatVars() {
 
 func (f *FormatterGoStorageDynamics) FormatFuncs() {
 	f.WriteString(`
-func LoadDynamic(data map[string]string, packageName, excelName, sheetName string) {
-	if data == nil {
-		return
-	}
-	name := strings.Join([]string{packageName, excelName, sheetName}, ".")
-	if _, ok := data[name]; !ok {
-		return
-	}
+func LoadDynamic(packageName, excelName, sheetName string, jsonStr string) {
 	excelTypeStorages, ok := TypeStorage[excelName]
 	if !ok {
 		return
@@ -54,7 +43,7 @@ func LoadDynamic(data map[string]string, packageName, excelName, sheetName strin
 	}
 	v := deepcopy.Copy(sheetTypeStorage)
 	var mapStructure any
-	if err := json.Unmarshal([]byte(data[name]), &mapStructure); err != nil {
+	if err := json.Unmarshal([]byte(jsonStr), &mapStructure); err != nil {
 		panic(err)
 	}
 	if err := mapstructure.Decode(mapStructure, &v); err != nil {
@@ -74,17 +63,15 @@ func LoadDynamic(data map[string]string, packageName, excelName, sheetName strin
 func (f *FormatterGoStorageDynamics) FormatLoading() {
 	f.WriteString(`
 func LoadDynamics(data map[string]string) {
-`)
-	for _, storage := range f.storages {
-		f.WriteString("\tLoadDynamic(data, \"")
-		f.WriteString(storage.StoragePath.PackageName)
-		f.WriteString("\", \"")
-		f.WriteString(storage.StoragePath.ExcelName)
-		f.WriteString("\", \"")
-		f.WriteString(storage.StoragePath.SheetName)
-		f.WriteString("\")\n")
+	for name, jsonStr := range data {
+		if strings.Count(name, ".") != 2 {
+			continue
+		}
+		names := strings.Split(name, ".")
+		LoadDynamic(names[0], names[1], names[2], jsonStr)
 	}
-	f.WriteString("}\n")
+}
+`)
 }
 
 func (f *FormatterGoStorageDynamics) Close() string {

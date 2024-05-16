@@ -142,7 +142,7 @@ func (c *ConverterGo) FormatStructs() {
 }
 
 func (c *ConverterGo) FormatStorageVars() {
-	formatter := NewFormatterGoStorageDynamics(c.collection.PackageNames(), c.collection.Storages())
+	formatter := NewFormatterGoStorageDynamics()
 	formatter.FormatPackages()
 	formatter.FormatVars()
 	formatter.FormatFuncs()
