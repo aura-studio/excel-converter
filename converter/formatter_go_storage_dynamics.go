@@ -52,7 +52,11 @@ func LoadDynamic(data map[string]string, packageName, excelName, sheetName strin
 		return
 	}
 	v := deepcopy.Copy(sheetTypeStorage)
-	if err := json.Unmarshal([]byte(data[name]), &v); err != nil {
+	var mapStructure any
+	if err := json.Unmarshal([]byte(data[name]), &mapStructure); err != nil {
+		panic(err)
+	}
+	if err := mapstructure.Decode(mapStructure, &v); err != nil {
 		panic(err)
 	}
 	if _, ok := OriginStorage[packageName]; !ok {
@@ -63,7 +67,6 @@ func LoadDynamic(data map[string]string, packageName, excelName, sheetName strin
 	}
 	OriginStorage[packageName][excelName][sheetName] = v
 }
-
 `)
 }
 
