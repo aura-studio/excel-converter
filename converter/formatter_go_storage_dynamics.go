@@ -24,6 +24,7 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/mitchellh/mapstructure"
 	"github.com/mohae/deepcopy"
 )
 `)
