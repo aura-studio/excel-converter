@@ -20,25 +20,32 @@ package storage
 
 func (f *FormatterGoStorageTypes) FormatPackages() {
 	f.WriteString("\nimport (\n")
+	f.WriteString("\t\"encoding/json\"\n")
 	f.WriteString("\t\"")
 	f.WriteString(path.ImportPath())
 	f.WriteString("/structs\"\n")
 	f.WriteString(")\n")
 }
 
+func (f *FormatterGoStorageTypes) FormatTypes() {
+	f.WriteString(`
+type TypeFunc func([]byte) any
+`)
+}
+
 func (f *FormatterGoStorageTypes) FormatVars() {
 	f.WriteString(`
-var TypeStorage = make(map[string]map[string]any)
+var TypeStorage = make(map[string]map[string]TypeFunc)
 `)
 }
 
 func (f *FormatterGoStorageTypes) FormatFuncs() {
 	f.WriteString(`
-func LoadType(excelName, sheetName string, v any) {
+func LoadType(excelName, sheetName string, f TypeFunc) {
 	if _, ok := TypeStorage[excelName]; !ok {
-		TypeStorage[excelName] = make(map[string]any)
+		TypeStorage[excelName] = make(map[string]TypeFunc)
 	}
-	TypeStorage[excelName][sheetName] = v
+	TypeStorage[excelName][sheetName] = f
 }
 
 func LoadTypes() {
@@ -57,8 +64,16 @@ func (f *FormatterGoStorageTypes) FormatNode(node Node) {
 	f.WriteString("\", \"")
 	f.WriteString(node.SheetPathName())
 	f.WriteString("\", ")
+	f.WriteString(`func(data []byte) any {
+	var v = `)
 	f.FormatValue(node, source, nil)
-	f.WriteString(")\n")
+	f.WriteString(`
+		if err := json.Unmarshal(data, &v); err != nil {
+			panic(err)
+		}
+		return v
+	})
+`)
 }
 
 func (f *FormatterGoStorageTypes) FormatVarName(node Node) {

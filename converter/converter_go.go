@@ -198,6 +198,7 @@ func (c *ConverterGo) FormatStorage() {
 func (c *ConverterGo) FormatStorageTypes() {
 	formatter := NewFormatterGoStorageTypes(c.identifier)
 	formatter.FormatPackages()
+	formatter.FormatTypes()
 	formatter.FormatVars()
 	formatter.FormatFuncs()
 	var nodes = []Node{}

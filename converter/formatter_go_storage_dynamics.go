@@ -17,11 +17,7 @@ package storage
 func (f *FormatterGoStorageDynamics) FormatPackages() {
 	f.WriteString(`
 import (
-	"encoding/json"
 	"strings"
-
-	"github.com/mitchellh/mapstructure"
-	"github.com/mohae/deepcopy"
 )
 `)
 }
@@ -37,17 +33,9 @@ func LoadDynamic(packageName, excelName, sheetName string, jsonStr string) {
 	if !ok {
 		return
 	}
-	sheetTypeStorage, ok := excelTypeStorages[sheetName]
+	f, ok := excelTypeStorages[sheetName]
 	if !ok {
 		return
-	}
-	v := deepcopy.Copy(sheetTypeStorage)
-	var mapStructure any
-	if err := json.Unmarshal([]byte(jsonStr), &mapStructure); err != nil {
-		panic(err)
-	}
-	if err := mapstructure.Decode(mapStructure, &v); err != nil {
-		panic(err)
 	}
 	if _, ok := OriginStorage[packageName]; !ok {
 		OriginStorage[packageName] = make(map[string]map[string]any)
@@ -55,7 +43,7 @@ func LoadDynamic(packageName, excelName, sheetName string, jsonStr string) {
 	if _, ok := OriginStorage[packageName][excelName]; !ok {
 		OriginStorage[packageName][excelName] = make(map[string]any)
 	}
-	OriginStorage[packageName][excelName][sheetName] = v
+	OriginStorage[packageName][excelName][sheetName] = f([]byte(jsonStr))
 }
 `)
 }
