@@ -203,6 +203,10 @@ func (f Format) ToGoPackageCase(s string) string {
 	return strings.ReplaceAll(format.ToLowerRaw(s), FlagUnderScore, "")
 }
 
+func (f Format) ToJsonPackageCase(s string) string {
+	return format.ToLowerRaw(s)
+}
+
 func (f Format) ToLuaPackageCase(s string) string {
 	return format.ToLowerRaw(s)
 }

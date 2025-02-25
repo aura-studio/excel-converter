@@ -83,7 +83,7 @@ func (c *ConverterJson) Format() {
 func (c *ConverterJson) GetFilePath(domain Domain) string {
 	for _, excels := range domain {
 		for _, excel := range excels {
-			packageName := format.ToLuaPackageCase(excel.PackageName())
+			packageName := format.ToJsonPackageCase(excel.PackageName())
 			fileName := fmt.Sprintf("%s.json", excel.DomainName())
 			return filepath.Join(path.ExportAbsPath(), packageName, fileName)
 		}
@@ -95,7 +95,7 @@ func (c *ConverterJson) GetFilePath(domain Domain) string {
 func (c *ConverterJson) GetPackageName(domain Domain) string {
 	for _, excels := range domain {
 		for _, excel := range excels {
-			return format.ToGoPackageCase(excel.PackageName())
+			return format.ToJsonPackageCase(excel.PackageName())
 		}
 	}
 	Exit("[Main] Cannot find excel in domain")
