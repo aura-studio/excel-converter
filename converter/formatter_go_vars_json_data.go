@@ -237,7 +237,7 @@ func (f *FormatterGoVarsJSONData) FormatStruct(node Node, sources []Source) {
 		}
 		validIndexes = append(validIndexes, index)
 	}
-	for _, index := range validIndexes {
+	for i, index := range validIndexes {
 		source := sources[index]
 		nodeSub := nodes[index]
 		if source.Type() == SourceTypeNil && nodeSub.Type() != NodeTypeSimple {
@@ -247,7 +247,7 @@ func (f *FormatterGoVarsJSONData) FormatStruct(node Node, sources []Source) {
 		f.FormatFieldName(nodeSub)
 		f.WriteString(": ")
 		f.FormatValue(nodeSub, source, node)
-		if index < len(validIndexes)-1 {
+		if i < len(validIndexes)-1 {
 			f.WriteString(",\n")
 		} else {
 			f.WriteString("\n")
