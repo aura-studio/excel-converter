@@ -100,6 +100,10 @@ func (s *SheetBase) GetVerticle(index int) []string {
 	return s.GetContentSection().GetVertical(index, s.FieldIndexes())
 }
 
+func (s *SheetBase) GetCell(field HeaderField, index int) string {
+	return s.GetContentSection().GetCell(field.Index, index, s.FieldIndexes())
+}
+
 func (s *SheetBase) FieldIndexes() []int {
 	header := s.GetSection(SectionTypeHeader).(*SectionHeader)
 	return header.FieldIndexes()
@@ -129,10 +133,6 @@ func (s *SheetBase) GetIndex(key any) int {
 		return index
 	}
 	return s.GetContentSection().GetIndex(key)
-}
-
-func (s *SheetBase) GetCell(field HeaderField, index int) string {
-	return s.GetVerticle(field.Index)[index]
 }
 
 func (s *SheetBase) ParseContent(structure StructureType) {
