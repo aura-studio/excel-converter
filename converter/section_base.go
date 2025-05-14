@@ -68,14 +68,8 @@ func (s *SectionBase) GetVertical(index int, fieldIndexes []int) []string {
 	return vertical
 }
 
-func (s *SectionBase) GetCell(hIndex, vIndex int, fieldIndexes []int) string {
-	if hIndex >= len(s.data) {
-		Exit("[%v] Row index %d is out of length %d", s.sheet, hIndex, len(s.data))
-	}
-	if vIndex >= len(fieldIndexes) {
-		Exit("[%v] Column index %d is out of length %d", s.sheet, vIndex, len(fieldIndexes))
-	}
-	return s.data[hIndex][fieldIndexes[vIndex]]
+func (s *SectionBase) GetCell(hIndex, vIndex int) string {
+	return s.data[hIndex][vIndex]
 }
 
 func (s *SectionBase) Format(int) {

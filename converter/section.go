@@ -17,7 +17,7 @@ type Section interface {
 	Size() int
 	GetHorizon(int, []int) []string
 	GetVertical(int, []int) []string
-	GetCell(int, int, []int) string
+	GetCell(int, int) string
 	Format(int)
 	GetIndex(any) int
 }
