@@ -101,7 +101,7 @@ func (s *SheetBase) GetVerticle(index int) []string {
 }
 
 func (s *SheetBase) GetCell(field HeaderField, index int) string {
-	return s.GetContentSection().GetCell(field.Index, index)
+	return s.GetHorizon(index)[field.Index]
 }
 
 func (s *SheetBase) FieldIndexes() []int {

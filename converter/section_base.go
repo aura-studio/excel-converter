@@ -68,10 +68,6 @@ func (s *SectionBase) GetVertical(index int, fieldIndexes []int) []string {
 	return vertical
 }
 
-func (s *SectionBase) GetCell(hIndex, vIndex int) string {
-	return s.data[hIndex][vIndex]
-}
-
 func (s *SectionBase) Format(int) {
 
 }
