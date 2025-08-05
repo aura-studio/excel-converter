@@ -32,6 +32,9 @@ func init() {
 		ConverterTypeJson: func() Converter {
 			return NewConverterJson()
 		},
+		ConverterTypeProto: func() Converter {
+			return NewConverterProto()
+		},
 	}
 }
 

@@ -33,7 +33,7 @@ func (c *ConverterProto) Parse() {
 }
 
 func (c *ConverterProto) Export() {
-	// c.Format()
+	c.Format()
 	c.Remove()
 	c.Write()
 }
@@ -126,6 +126,6 @@ func (c *ConverterProto) FormatMessages() {
 	formatter := NewFormatterProtoMessages(c.identifier)
 	formatter.FormatMessages()
 	content := formatter.Close()
-	filepath := filepath.Join(c.ExportPath, "messages.proto")
+	filepath := filepath.Join(path.ExportAbsPath(), "messages.proto")
 	c.contentMap[filepath] = content
 }

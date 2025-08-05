@@ -122,6 +122,8 @@ func (c *ConverterBase) Scan() {
 			fieldType = FieldTypeClient
 		case ConverterTypeJson:
 			fieldType = FieldTypeClient
+		case ConverterTypeProto:
+			fieldType = FieldTypeClient
 		default:
 			Exit("[Main] Unsupported converter type %s", c.typ)
 		}
