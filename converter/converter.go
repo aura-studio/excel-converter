@@ -8,9 +8,10 @@ import (
 type ConverterType string
 
 const (
-	ConverterTypeGo   ConverterType = "go"
-	ConverterTypeLua  ConverterType = "lua"
-	ConverterTypeJson ConverterType = "json"
+	ConverterTypeGo    ConverterType = "go"
+	ConverterTypeLua   ConverterType = "lua"
+	ConverterTypeJson  ConverterType = "json"
+	ConverterTypeProto ConverterType = "proto"
 )
 
 type Converter interface {
