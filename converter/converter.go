@@ -8,9 +8,10 @@ import (
 type ConverterType string
 
 const (
-	ConverterTypeGo   ConverterType = "go"
-	ConverterTypeLua  ConverterType = "lua"
-	ConverterTypeJson ConverterType = "json"
+	ConverterTypeGo     ConverterType = "go"
+	ConverterTypeLua    ConverterType = "lua"
+	ConverterTypeJson   ConverterType = "json"
+	ConverterTypeCSharp ConverterType = "csharp"
 )
 
 type Converter interface {
@@ -30,6 +31,9 @@ func init() {
 		},
 		ConverterTypeJson: func() Converter {
 			return NewConverterJson()
+		},
+		ConverterTypeCSharp: func() Converter {
+			return NewConverterCSharp()
 		},
 	}
 }
