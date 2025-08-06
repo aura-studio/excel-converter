@@ -12,9 +12,9 @@ type Identifier struct {
 	StrNodeMap map[string]uint32 // key: str, val: node id
 	NodeStrMap map[uint32]string // key: node id, val: str
 
-	NodeStructMap   map[uint32]string // key: node id, val: struct name
-	NodeTypeMap     map[uint32]string // key: node id, val: type name
-	NodeDataTypeMap map[uint32]string // key: node id, val: type name only struct type
+	NodeStructMap   map[uint32]string // [golang 名字拼接]key: node id, val: struct name
+	NodeTypeMap     map[uint32]string // [golang 类型定义] key: node id, val: type name
+	NodeDataTypeMap map[uint32]string // [golang 带引用的类型] key: node id, val: type name only struct type
 
 	StructEqualMap map[string]string // key: dst struct, val: src struct
 	StructEquals   [][]string
@@ -43,6 +43,7 @@ func (i *Identifier) GenerateType(node Node) {
 }
 
 func (i *Identifier) generateStruct(name string, node Node) {
+	fmt.Println(name, node.Field().Name)
 	name = fmt.Sprintf("%s%s", name, node.Field().Name)
 	i.NodeStructMap[node.ID()] = name
 	for _, node := range node.Nodes() {
