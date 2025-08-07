@@ -35,7 +35,7 @@ type TypeFunc func([]byte) any
 
 func (f *FormatterGoStorageTypes) FormatVars() {
 	f.WriteString(`
-var TypeStorage = make(map[string]map[string]TypeFunc)
+	var TypeStorage = make(map[string]map[string]TypeFunc)
 `)
 }
 
