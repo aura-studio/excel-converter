@@ -43,7 +43,7 @@ func (c *ConverterCSharp) Identity() {
 	c.ForeachExcel(func(e Excel) {
 		if e.Type() == ExcelTypeTemplate {
 			for _, node := range e.Nodes() {
-				if node.Excel().ForServer() && node.Sheet().ForServer() {
+				if node.Excel().ForClient() && node.Sheet().ForClient() {
 					nodes = append(nodes, node)
 				}
 			}
@@ -74,7 +74,7 @@ func (c *ConverterCSharp) Identity() {
 	c.ForeachExcel(func(e Excel) {
 		if e.Type() == ExcelTypeTemplate || e.Type() == ExcelTypeRegular {
 			for _, node := range e.Nodes() {
-				if node.Excel().ForServer() && node.Sheet().ForServer() {
+				if node.Excel().ForClient() && node.Sheet().ForClient() {
 					c.identifier.GenerateStruct(node)
 				}
 			}
@@ -83,7 +83,7 @@ func (c *ConverterCSharp) Identity() {
 	c.ForeachExcel(func(e Excel) {
 		if e.Type() == ExcelTypeTemplate || e.Type() == ExcelTypeRegular {
 			for _, node := range e.Nodes() {
-				if node.Excel().ForServer() && node.Sheet().ForServer() {
+				if node.Excel().ForClient() && node.Sheet().ForClient() {
 					c.identifier.GenerateType(node)
 				}
 			}
@@ -101,7 +101,7 @@ func (c *ConverterCSharp) Link() {
 	c.ForeachExcel(func(e Excel) {
 		if e.Type() == ExcelTypeRegular {
 			for _, node := range e.Nodes() {
-				if node.Excel().ForServer() && node.Sheet().ForServer() {
+				if node.Excel().ForClient() && node.Sheet().ForClient() {
 					c.collection.ReadNode(node)
 				}
 			}
