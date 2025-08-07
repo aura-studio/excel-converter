@@ -11,7 +11,7 @@ type ConverterJson struct {
 
 func NewConverterJson() *ConverterJson {
 	c := &ConverterJson{
-		ConverterBase: NewConverterBase(ConverterTypeJson),
+		ConverterBase: NewConverterBase(ConverterTypeJson, FieldTypeClient),
 	}
 	return c
 }
@@ -43,6 +43,7 @@ func (c *ConverterJson) GetJSONDataPath(domain Domain) string {
 	Exit("[Main] Cannot find excel in domain")
 	return ""
 }
+
 func (c *ConverterJson) Format() {
 	domains := make([]Domain, 0)
 	c.ForeachDomain(func(domain Domain) {

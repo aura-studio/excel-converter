@@ -11,7 +11,7 @@ type ConverterLua struct {
 
 func NewConverterLua() *ConverterLua {
 	c := &ConverterLua{
-		ConverterBase: NewConverterBase(ConverterTypeLua),
+		ConverterBase: NewConverterBase(ConverterTypeLua, FieldTypeClient),
 	}
 	return c
 }

@@ -14,7 +14,7 @@ type ConverterGo struct {
 
 func NewConverterGo() *ConverterGo {
 	c := &ConverterGo{
-		ConverterBase: NewConverterBase(ConverterTypeGo),
+		ConverterBase: NewConverterBase(ConverterTypeGo, FieldTypeServer),
 		identifier:    NewIdentifier(),
 		collection:    NewCollection(),
 	}

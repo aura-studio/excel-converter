@@ -17,21 +17,23 @@ type Domain map[ExcelType][]Excel
 type Task func() any
 
 type ConverterBase struct {
-	typ        ConverterType
-	excelMap   map[string]map[string]Domain
-	contentMap map[string]string
+	ConverterType ConverterType
+	FieldType     FieldType
+	excelMap      map[string]map[string]Domain
+	contentMap    map[string]string
 }
 
-func NewConverterBase(typ ConverterType) *ConverterBase {
+func NewConverterBase(converterType ConverterType, fieldType FieldType) *ConverterBase {
 	return &ConverterBase{
-		typ:        typ,
-		excelMap:   make(map[string]map[string]Domain),
-		contentMap: make(map[string]string),
+		ConverterType: converterType,
+		FieldType:     fieldType,
+		excelMap:      make(map[string]map[string]Domain),
+		contentMap:    make(map[string]string),
 	}
 }
 
 func (c *ConverterBase) String() string {
-	return string(c.typ)
+	return string(c.ConverterType)
 }
 
 func (c *ConverterBase) Run() {
@@ -114,18 +116,7 @@ func (c *ConverterBase) Scan() {
 			return err
 		}
 		excelType := c.ExcelType(relPath)
-		var fieldType FieldType
-		switch c.typ {
-		case ConverterTypeGo:
-			fieldType = FieldTypeServer
-		case ConverterTypeLua:
-			fieldType = FieldTypeClient
-		case ConverterTypeJson:
-			fieldType = FieldTypeClient
-		default:
-			Exit("[Main] Unsupported converter type %s", c.typ)
-		}
-		excel := excelCreators[excelType](path, relPath, fieldType)
+		excel := excelCreators[excelType](path, relPath, c.FieldType)
 		packageName := excel.PackageName()
 		if _, ok := c.excelMap[packageName]; !ok {
 			c.excelMap[packageName] = make(map[string]Domain)

@@ -13,7 +13,7 @@ type ConverterCSharp struct {
 
 func NewConverterCSharp() *ConverterCSharp {
 	c := &ConverterCSharp{
-		ConverterBase: NewConverterBase(ConverterTypeCSharp),
+		ConverterBase: NewConverterBase(ConverterTypeCSharp, FieldTypeClient),
 		identifier:    NewIdentifier(),
 		collection:    NewCollection(),
 	}
@@ -57,7 +57,7 @@ func (c *ConverterCSharp) Identity() {
 	}
 	nodes = []Node{}
 	c.ForeachExcel(func(e Excel) {
-		if e.Type() == ExcelTypeTemplate {
+		if e.Type() == ExcelTypeRegular {
 			for _, node := range e.Nodes() {
 				if node.Excel().ForClient() && node.Sheet().ForClient() {
 					nodes = append(nodes, node)
@@ -127,6 +127,6 @@ func (c *ConverterCSharp) FormatStructs() {
 	formatter.FormatStruct()
 	formatter.FormatStructEqual()
 	content := formatter.Close()
-	filePath := filepath.Join(path.ExportAbsPath(), "structs", "structs.go")
+	filePath := filepath.Join(path.ExportAbsPath(), "Structs.cs")
 	c.contentMap[filePath] = content
 }

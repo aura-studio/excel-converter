@@ -43,7 +43,6 @@ func (i *Identifier) GenerateType(node Node) {
 }
 
 func (i *Identifier) generateStruct(name string, node Node) {
-	fmt.Println(name, node.Field().Name)
 	name = fmt.Sprintf("%s%s", name, node.Field().Name)
 	i.NodeStructMap[node.ID()] = name
 	for _, node := range node.Nodes() {
