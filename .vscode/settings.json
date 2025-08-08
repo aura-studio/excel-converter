@@ -15,6 +15,18 @@
         "vendor/*": true,
     },
     "git.autofetchPeriod": 60,
+    "explorer.decorations.colors": true,
+    "explorer.decorations.badges": true,
+    "problems.decorations.enabled": true,
+    "workbench.colorCustomizations": {
+        "problemsErrorIcon.foreground": "#DA6A63",
+        "list.errorForeground": "#DA6A63",
+        "explorer.decorations.errorBadgeBackground": "#DA6A63",
+        "explorer.decorations.errorBadgeForeground": "#ffffff",
+        "editorError.foreground": "#DA6A63",
+        "scrollbarSlider.activeBackground": "#DA6A63",
+        "editorOverviewRuler.errorForeground": "#DA6A63"
+    },
     "git.autofetch": true,
     "git.fetchOnPull": true,
     "git.autorefresh": true,
@@ -37,7 +49,6 @@
     "go.testEnvVars": {
         "GO111MODULE": "on"
     },
-    "go.docsTool": "gogetdoc",
     "go.formatTool": "gofumpt",
     "go.formatFlags": [],
     "go.lintTool": "golangci-lint",
@@ -53,29 +64,25 @@
     "go.enableCodeLens": {
         "runtest": true
     },
-    "go.buildOnSave": "package",
+    "go.useLanguageServer": true,
+    "go.languageServerExperimentalFeatures": {
+        "diagnostics": true,
+        "documentLink": true
+    },
     "go.gotoSymbol.ignoreFolders": [],
-    "go.inferGopath": false,
     "go.gotoSymbol.includeGoroot": true,
     "go.gotoSymbol.includeImports": true,
-    "go.installDependenciesWhenBuilding": true,
-    "go.useLanguageServer": true,
-    "go.languageServerFlags": [
-        "-rpc.trace",
-        "serve",
-        "--debug=localhost:6060"
-    ],
-    "go.languageServerExperimentalFeatures": {
-        "diagnostics": true
-    },
     "go.autocompleteUnimportedPackages": true,
-    "go.coverOnTestPackage": true,
-    "go.liveErrors": {
-        "enabled": false,
-        "delay": 500
-    },
     "go.useCodeSnippetsOnFunctionSuggest": true,
     "go.useCodeSnippetsOnFunctionSuggestWithoutType": true,
+    "go.liveErrors": {
+        "enabled": true,
+        "delay": 500
+    },
+    "go.buildOnSave": "package",
+    "go.inferGopath": false,
+    "go.installDependenciesWhenBuilding": true,
+    "go.coverOnTestPackage": true,
     "go.toolsManagement.checkForUpdates": "proxy",
     "go.toolsEnvVars": {
         "GOOS": "windows",
@@ -83,19 +90,4 @@
         "CGO_ENABLED": "1",
         "GO111MODULE": "auto"
     },
-    "svn.ignoreMissingSvnWarning": true,
-    "clang-format.style": "google",
-    "clang-format.executable": "${workspaceRoot}\\misc\\clang-format.exe",
-    "clang-format.language.proto.enable": true,
-    "clang-format.language.proto.style": "",
-    "clang-format.language.proto.fallbackStyle": "",
-    "runOnSave.commands": [
-        {
-            "match": "proto\\\\.*",
-            "command": "protoc --proto_path=${workspaceFolder} --go_out=${workspaceFolder}/../ ${file} && protoc-go-inject-tag -input=${workspaceFolder}/msg/${fileBasenameNoExtension}.pb.go",
-            "runIn": "backend",
-            "runningStatusMessage": "Compiling ${file}",
-            "finishStatusMessage": "${file} compiled"
-        },
-    ]
 }
