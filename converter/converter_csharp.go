@@ -13,7 +13,7 @@ type ConverterCSharp struct {
 
 func NewConverterCSharp() *ConverterCSharp {
 	c := &ConverterCSharp{
-		ConverterBase: NewConverterBase(ConverterTypeCSharp, FieldTypeClient),
+		ConverterBase: NewConverterBase(ConverterTypeCSharp, DataTypeClient),
 		identifier:    NewIdentifier(),
 		collection:    NewCollection(),
 	}

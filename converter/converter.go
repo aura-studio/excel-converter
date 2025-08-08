@@ -14,6 +14,13 @@ const (
 	ConverterTypeCSharp ConverterType = "csharp"
 )
 
+type DataType string
+
+const (
+	DataTypeServer DataType = "server"
+	DataTypeClient DataType = "client"
+)
+
 type Converter interface {
 	String() string
 	Run()

@@ -4,9 +4,9 @@ type ExcelComment struct {
 	*ExcelBase
 }
 
-func NewExcelComment(path Path, relPath string, fieldType FieldType) *ExcelComment {
+func NewExcelComment(path Path, relPath string) *ExcelComment {
 	return &ExcelComment{
-		ExcelBase: NewExcelBase(path, relPath, fieldType),
+		ExcelBase: NewExcelBase(path, relPath),
 	}
 }
 

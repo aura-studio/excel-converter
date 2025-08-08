@@ -4,9 +4,9 @@ type ExcelSettings struct {
 	*ExcelBase
 }
 
-func NewExcelSettings(path Path, relPath string, fieldType FieldType) *ExcelSettings {
+func NewExcelSettings(path Path, relPath string) *ExcelSettings {
 	return &ExcelSettings{
-		ExcelBase: NewExcelBase(path, relPath, fieldType),
+		ExcelBase: NewExcelBase(path, relPath),
 	}
 }
 

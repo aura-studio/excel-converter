@@ -5,9 +5,9 @@ import "strings"
 type FieldType string
 
 const (
-	FieldTypeServer  FieldType = "server"
-	FieldTypeClient  FieldType = "client"
-	FieldTypeComment FieldType = "comment"
+	FieldTypeServer  FieldType = "Server"
+	FieldTypeClient  FieldType = "Client"
+	FieldTypeComment FieldType = "Comment"
 )
 
 type HeaderField struct {
@@ -18,8 +18,7 @@ type HeaderField struct {
 
 type SectionHeader struct {
 	*SectionBase
-	fieldMap         map[FieldType][]int
-	currentFieldType FieldType
+	fieldMap map[FieldType][]int
 }
 
 func NewSectionHeader(sheet Sheet) *SectionHeader {
@@ -97,7 +96,7 @@ func (s *SectionHeader) fmtFieldName(name string) string {
 	return format.ToUpper(name)
 }
 
-func (s *SectionHeader) ParseFields(fieldType FieldType) {
+func (s *SectionHeader) ParseFields() {
 	for index := 0; index < len(s.data[0]); index++ {
 		switch {
 		case strings.HasPrefix(s.data[0][index], FlagComment):
@@ -111,7 +110,6 @@ func (s *SectionHeader) ParseFields(fieldType FieldType) {
 			s.fieldMap[FieldTypeClient] = append(s.fieldMap[FieldTypeClient], index)
 		}
 	}
-	s.currentFieldType = fieldType
 }
 
 func (s *SectionHeader) FieldIndexes() []int {

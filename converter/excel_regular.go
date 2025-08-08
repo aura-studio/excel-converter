@@ -10,9 +10,9 @@ type ExcelRegular struct {
 	*ExcelBase
 }
 
-func NewExcelRegular(path Path, relPath string, fieldType FieldType) *ExcelRegular {
+func NewExcelRegular(path Path, relPath string) *ExcelRegular {
 	return &ExcelRegular{
-		ExcelBase: NewExcelBase(path, relPath, fieldType),
+		ExcelBase: NewExcelBase(path, relPath),
 	}
 }
 

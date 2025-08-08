@@ -30,21 +30,21 @@ type Excel interface {
 	ForClient() bool
 }
 
-var excelCreators map[ExcelType]func(Path, string, FieldType) Excel
+var excelCreators map[ExcelType]func(Path, string) Excel
 
 func init() {
-	excelCreators = map[ExcelType]func(Path, string, FieldType) Excel{
-		ExcelTypeComment: func(path Path, relPath string, fieldType FieldType) Excel {
-			return NewExcelComment(path, relPath, fieldType)
+	excelCreators = map[ExcelType]func(Path, string) Excel{
+		ExcelTypeComment: func(path Path, relPath string) Excel {
+			return NewExcelComment(path, relPath)
 		},
-		ExcelTypeSettings: func(path Path, relPath string, fieldType FieldType) Excel {
-			return NewExcelSettings(path, relPath, fieldType)
+		ExcelTypeSettings: func(path Path, relPath string) Excel {
+			return NewExcelSettings(path, relPath)
 		},
-		ExcelTypeTemplate: func(path Path, relPath string, fieldType FieldType) Excel {
-			return NewExcelTemplate(path, relPath, fieldType)
+		ExcelTypeTemplate: func(path Path, relPath string) Excel {
+			return NewExcelTemplate(path, relPath)
 		},
-		ExcelTypeRegular: func(path Path, relPath string, fieldType FieldType) Excel {
-			return NewExcelRegular(path, relPath, fieldType)
+		ExcelTypeRegular: func(path Path, relPath string) Excel {
+			return NewExcelRegular(path, relPath)
 		},
 	}
 }

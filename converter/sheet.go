@@ -25,7 +25,7 @@ type Sheet interface {
 	GetCell(HeaderField, int) string
 	GetIndex(any) int
 	ParseContent(StructureType)
-	FormatHeader(FieldType)
+	FormatHeader()
 	FormatContent()
 	ForServer() bool
 	ForClient() bool

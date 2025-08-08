@@ -11,7 +11,7 @@ type ConverterJson struct {
 
 func NewConverterJson() *ConverterJson {
 	c := &ConverterJson{
-		ConverterBase: NewConverterBase(ConverterTypeJson, FieldTypeClient),
+		ConverterBase: NewConverterBase(ConverterTypeJson, DataTypeClient),
 	}
 	return c
 }

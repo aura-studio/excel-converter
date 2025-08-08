@@ -31,9 +31,9 @@ func (s *SheetBase) Read() {
 
 }
 
-func (s *SheetBase) FormatHeader(fieldType FieldType) {
+func (s *SheetBase) FormatHeader() {
 	s.GetSection(SectionTypeHeader).Format(0)
-	s.GetSection(SectionTypeHeader).(*SectionHeader).ParseFields(fieldType)
+	s.GetSection(SectionTypeHeader).(*SectionHeader).ParseFields()
 }
 
 func (s *SheetBase) FormatContent() {

@@ -9,18 +9,16 @@ import (
 )
 
 type ExcelBase struct {
-	fieldType FieldType
-	relPath   string
-	file      *excelize.File
-	sheetMap  map[SheetType]map[string]Sheet
-	nodes     []Node
+	relPath  string
+	file     *excelize.File
+	sheetMap map[SheetType]map[string]Sheet
+	nodes    []Node
 }
 
-func NewExcelBase(path Path, relPath string, fieldType FieldType) *ExcelBase {
+func NewExcelBase(path Path, relPath string) *ExcelBase {
 	return &ExcelBase{
-		fieldType: fieldType,
-		relPath:   relPath,
-		sheetMap:  map[SheetType]map[string]Sheet{},
+		relPath:  relPath,
+		sheetMap: map[SheetType]map[string]Sheet{},
 	}
 }
 
@@ -34,13 +32,13 @@ func (e *ExcelBase) Read() {
 
 func (e *ExcelBase) Preprocess() {
 	for _, sheet := range e.sheetMap[SheetTypeRegular] {
-		sheet.FormatHeader(e.fieldType)
+		sheet.FormatHeader()
 	}
 	for _, sheet := range e.sheetMap[SheetTypeInferior] {
-		sheet.FormatHeader(e.fieldType)
+		sheet.FormatHeader()
 	}
 	for _, sheet := range e.sheetMap[SheetTypeSettings] {
-		sheet.FormatHeader(e.fieldType)
+		sheet.FormatHeader()
 	}
 }
 

@@ -18,15 +18,15 @@ type Task func() any
 
 type ConverterBase struct {
 	ConverterType ConverterType
-	FieldType     FieldType
+	dataType      DataType
 	excelMap      map[string]map[string]Domain
 	contentMap    map[string]string
 }
 
-func NewConverterBase(converterType ConverterType, fieldType FieldType) *ConverterBase {
+func NewConverterBase(converterType ConverterType, dataType DataType) *ConverterBase {
 	return &ConverterBase{
 		ConverterType: converterType,
-		FieldType:     fieldType,
+		dataType:      dataType,
 		excelMap:      make(map[string]map[string]Domain),
 		contentMap:    make(map[string]string),
 	}
@@ -116,7 +116,7 @@ func (c *ConverterBase) Scan() {
 			return err
 		}
 		excelType := c.ExcelType(relPath)
-		excel := excelCreators[excelType](path, relPath, c.FieldType)
+		excel := excelCreators[excelType](path, relPath)
 		packageName := excel.PackageName()
 		if _, ok := c.excelMap[packageName]; !ok {
 			c.excelMap[packageName] = make(map[string]Domain)
