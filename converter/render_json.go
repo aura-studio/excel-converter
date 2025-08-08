@@ -5,46 +5,13 @@ import (
 	"path/filepath"
 )
 
-type ConverterJson struct {
-	*ConverterBase
+type RenderJson struct{}
+
+func NewRenderJson() *RenderJson {
+	return &RenderJson{}
 }
 
-func NewConverterJson() *ConverterJson {
-	c := &ConverterJson{
-		ConverterBase: NewConverterBase(ConverterTypeJson, DataTypeClient),
-	}
-	return c
-}
-
-func (c *ConverterJson) Run() {
-	c.Load()
-	c.Parse()
-	c.Export()
-}
-
-func (c *ConverterJson) Parse() {
-	c.Build()
-}
-
-func (c *ConverterJson) Export() {
-	c.Format()
-	c.Remove()
-	c.Write()
-}
-
-func (c *ConverterJson) GetJSONDataPath(domain Domain) string {
-	for _, excels := range domain {
-		for _, excel := range excels {
-			goPackageName := format.ToGoPackageCase(excel.PackageName())
-			fileName := fmt.Sprintf("%s.json", format.ToLower(excel.DomainName()))
-			return filepath.Join(path.ExportAbsPath(), goPackageName, fileName)
-		}
-	}
-	Exit("[Main] Cannot find excel in domain")
-	return ""
-}
-
-func (c *ConverterJson) Format() {
+func (r *RenderJson) Render(c *Converter) {
 	domains := make([]Domain, 0)
 	c.ForeachDomain(func(domain Domain) {
 		domains = append(domains, domain)
@@ -52,7 +19,7 @@ func (c *ConverterJson) Format() {
 	results := c.Parallel(ToSlice(domains), func(param any) func() any {
 		return func() any {
 			domain := param.(Domain)
-			formatter := NewFormatterJSON(c.GetPackageName(domain))
+			formatter := NewFormatterJSON(r.GetPackageName(domain))
 			for excelIdx, excel := range domain[ExcelTypeRegular] {
 				nodes := make([]Node, 0)
 				for _, node := range excel.Nodes() {
@@ -68,7 +35,7 @@ func (c *ConverterJson) Format() {
 			if len(content) == 0 {
 				return nil
 			}
-			return []string{c.GetFilePath(domain), content}
+			return []string{r.GetFilePath(domain), content}
 		}
 	})
 	for _, result := range results {
@@ -81,7 +48,7 @@ func (c *ConverterJson) Format() {
 	}
 }
 
-func (c *ConverterJson) GetFilePath(domain Domain) string {
+func (r *RenderJson) GetFilePath(domain Domain) string {
 	for _, excels := range domain {
 		for _, excel := range excels {
 			packageName := format.ToJsonPackageCase(excel.PackageName())
@@ -93,7 +60,7 @@ func (c *ConverterJson) GetFilePath(domain Domain) string {
 	return ""
 }
 
-func (c *ConverterJson) GetPackageName(domain Domain) string {
+func (r *RenderJson) GetPackageName(domain Domain) string {
 	for _, excels := range domain {
 		for _, excel := range excels {
 			return format.ToJsonPackageCase(excel.PackageName())

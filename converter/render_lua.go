@@ -5,34 +5,13 @@ import (
 	"path/filepath"
 )
 
-type ConverterLua struct {
-	*ConverterBase
+type RenderLua struct{}
+
+func NewRenderLua() *RenderLua {
+	return &RenderLua{}
 }
 
-func NewConverterLua() *ConverterLua {
-	c := &ConverterLua{
-		ConverterBase: NewConverterBase(ConverterTypeLua, DataTypeClient),
-	}
-	return c
-}
-
-func (c *ConverterLua) Run() {
-	c.Load()
-	c.Parse()
-	c.Export()
-}
-
-func (c *ConverterLua) Parse() {
-	c.Build()
-}
-
-func (c *ConverterLua) Export() {
-	c.Format()
-	c.Remove()
-	c.Write()
-}
-
-func (c *ConverterLua) Format() {
+func (r *RenderLua) Render(c *Converter) {
 	domains := make([]Domain, 0)
 	c.ForeachDomain(func(domain Domain) {
 		domains = append(domains, domain)
@@ -52,7 +31,7 @@ func (c *ConverterLua) Format() {
 			if len(content) == 0 {
 				return nil
 			}
-			return []string{c.GetFilePath(domain), content}
+			return []string{r.GetFilePath(domain), content}
 		}
 	})
 	for _, result := range results {
@@ -65,7 +44,7 @@ func (c *ConverterLua) Format() {
 	}
 }
 
-func (c *ConverterLua) GetFilePath(domain Domain) string {
+func (r *RenderLua) GetFilePath(domain Domain) string {
 	for _, excels := range domain {
 		for _, excel := range excels {
 			packageName := format.ToLuaPackageCase(excel.PackageName())

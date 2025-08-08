@@ -6,133 +6,26 @@ import (
 	"sort"
 )
 
-type ConverterGo struct {
-	*ConverterBase
-	identifier *Identifier
-	collection *Collection
+type RenderGo struct{}
+
+func NewRenderGo() *RenderGo {
+	return &RenderGo{}
 }
 
-func NewConverterGo() *ConverterGo {
-	c := &ConverterGo{
-		ConverterBase: NewConverterBase(ConverterTypeGo, DataTypeServer),
-		identifier:    NewIdentifier(),
-		collection:    NewCollection(),
-	}
-	return c
+func (r *RenderGo) Render(c *Converter) {
+	r.FormatVarsLiteralData(c)
+	r.FormatVarsJSONData(c)
+	r.FormatVars(c)
+	r.FormatStructs(c)
+	r.FormatStorageTypes(c)
+	r.FormatStorageVars(c)
+	r.FormatStorageStorages(c)
+	r.FormatStorageLinks(c)
+	r.FormatStorageCategories(c)
+	r.FormatStorage(c)
 }
 
-func (c *ConverterGo) Run() {
-	c.Load()
-	c.Parse()
-	c.Export()
-}
-
-func (c *ConverterGo) Parse() {
-	c.Build()
-	c.Identity()
-	c.Link()
-}
-
-func (c *ConverterGo) Export() {
-	c.Format()
-	c.Remove()
-	c.Write()
-}
-
-func (c *ConverterGo) Identity() {
-	nodes := []Node{}
-	c.ForeachExcel(func(e Excel) {
-		if e.Type() == ExcelTypeTemplate {
-			for _, node := range e.Nodes() {
-				if node.Excel().ForServer() && node.Sheet().ForServer() {
-					nodes = append(nodes, node)
-				}
-			}
-		}
-	})
-	sort.Slice(nodes, func(i, j int) bool {
-		return nodes[i].String() < nodes[j].String()
-	})
-	for _, node := range nodes {
-		c.identifier.GenerateStr(node)
-	}
-	nodes = []Node{}
-	c.ForeachExcel(func(e Excel) {
-		if e.Type() == ExcelTypeRegular {
-			for _, node := range e.Nodes() {
-				if node.Excel().ForServer() && node.Sheet().ForServer() {
-					nodes = append(nodes, node)
-				}
-			}
-		}
-	})
-	sort.Slice(nodes, func(i, j int) bool {
-		return nodes[i].String() < nodes[j].String()
-	})
-	for _, node := range nodes {
-		c.identifier.GenerateStr(node)
-	}
-	c.ForeachExcel(func(e Excel) {
-		if e.Type() == ExcelTypeTemplate || e.Type() == ExcelTypeRegular {
-			for _, node := range e.Nodes() {
-				if node.Excel().ForServer() && node.Sheet().ForServer() {
-					c.identifier.GenerateStruct(node)
-				}
-			}
-		}
-	})
-	c.ForeachExcel(func(e Excel) {
-		if e.Type() == ExcelTypeTemplate || e.Type() == ExcelTypeRegular {
-			for _, node := range e.Nodes() {
-				if node.Excel().ForServer() && node.Sheet().ForServer() {
-					c.identifier.GenerateType(node)
-				}
-			}
-		}
-	})
-
-	c.identifier.GenerateTypeEqual()
-
-	for str, nodeID := range c.identifier.StrNodeMap {
-		Debug("[Identifier] struct[%v] = %s\n", nodeID, str)
-	}
-}
-
-func (c *ConverterGo) Link() {
-	c.ForeachExcel(func(e Excel) {
-		if e.Type() == ExcelTypeRegular {
-			for _, node := range e.Nodes() {
-				if node.Excel().ForServer() && node.Sheet().ForServer() {
-					c.collection.ReadNode(node)
-				}
-			}
-		}
-	})
-	c.ForeachExcel(func(e Excel) {
-		if e.Type() == ExcelTypeSettings {
-			for _, sheets := range e.SheetMap() {
-				for _, sheet := range sheets {
-					c.collection.ReadLink(sheet)
-				}
-			}
-		}
-	})
-}
-
-func (c *ConverterGo) Format() {
-	c.FormatVarsLiteralData()
-	c.FormatVarsJSONData()
-	c.FormatVars()
-	c.FormatStructs()
-	c.FormatStorageTypes()
-	c.FormatStorageVars()
-	c.FormatStorageStorages()
-	c.FormatStorageLinks()
-	c.FormatStorageCategories()
-	c.FormatStorage()
-}
-
-func (c *ConverterGo) FormatStructs() {
+func (r *RenderGo) FormatStructs(c *Converter) {
 	formatter := NewFormatterGoStructs(c.identifier)
 	formatter.FormatStruct()
 	formatter.FormatStructEqual()
@@ -141,7 +34,7 @@ func (c *ConverterGo) FormatStructs() {
 	c.contentMap[filePath] = content
 }
 
-func (c *ConverterGo) FormatStorageVars() {
+func (r *RenderGo) FormatStorageVars(c *Converter) {
 	formatter := NewFormatterGoStorageDynamics()
 	formatter.FormatPackages()
 	formatter.FormatVars()
@@ -152,7 +45,7 @@ func (c *ConverterGo) FormatStorageVars() {
 	c.contentMap[filePath] = content
 }
 
-func (c *ConverterGo) FormatStorageStorages() {
+func (r *RenderGo) FormatStorageStorages(c *Converter) {
 	formatter := NewFormatterGoStorageStatics(c.collection.PackageNames(), c.collection.Storages())
 	formatter.FormatPackages()
 	formatter.FormatVars()
@@ -163,7 +56,7 @@ func (c *ConverterGo) FormatStorageStorages() {
 	c.contentMap[filePath] = content
 }
 
-func (c *ConverterGo) FormatStorageLinks() {
+func (r *RenderGo) FormatStorageLinks(c *Converter) {
 	formatter := NewFormatterGoStorageLinks(c.collection.Links())
 	formatter.FormatPackages()
 	formatter.FormatVars()
@@ -174,7 +67,7 @@ func (c *ConverterGo) FormatStorageLinks() {
 	c.contentMap[filePath] = content
 }
 
-func (c *ConverterGo) FormatStorageCategories() {
+func (r *RenderGo) FormatStorageCategories(c *Converter) {
 	formatter := NewFormatterGoStorageCategories(c.collection.Categories())
 	formatter.FormatPackages()
 	formatter.FormatFuncs()
@@ -184,7 +77,7 @@ func (c *ConverterGo) FormatStorageCategories() {
 	c.contentMap[filePath] = content
 }
 
-func (c *ConverterGo) FormatStorage() {
+func (r *RenderGo) FormatStorage(c *Converter) {
 	formatter := NewFormatterGoStorage()
 	formatter.FormatPackages()
 	formatter.FormatVars()
@@ -195,7 +88,7 @@ func (c *ConverterGo) FormatStorage() {
 	c.contentMap[filePath] = content
 }
 
-func (c *ConverterGo) FormatStorageTypes() {
+func (r *RenderGo) FormatStorageTypes(c *Converter) {
 	formatter := NewFormatterGoStorageTypes(c.identifier)
 	formatter.FormatPackages()
 	formatter.FormatTypes()
@@ -205,7 +98,7 @@ func (c *ConverterGo) FormatStorageTypes() {
 	for _, domain := range c.excelMap[FlagBase] {
 		for _, excel := range domain[ExcelTypeRegular] {
 			for _, node := range excel.Nodes() {
-				if node.Excel().ForServer() && node.Sheet().ForServer() {
+				if c.FilterNodeByDataType(node) {
 					nodes = append(nodes, node)
 				}
 			}
@@ -222,7 +115,7 @@ func (c *ConverterGo) FormatStorageTypes() {
 	c.contentMap[filePath] = content
 }
 
-func (c *ConverterGo) FormatVarsLiteralData() {
+func (r *RenderGo) FormatVarsLiteralData(c *Converter) {
 	domains := make([]Domain, 0)
 	c.ForeachDomain(func(domain Domain) {
 		domains = append(domains, domain)
@@ -230,10 +123,10 @@ func (c *ConverterGo) FormatVarsLiteralData() {
 	results := c.Parallel(ToSlice(domains), func(param any) func() any {
 		return func() any {
 			domain := param.(Domain)
-			formatter := NewFormatterGoLiteralData(c.GetPackageName(domain), c.identifier)
+			formatter := NewFormatterGoLiteralData(r.GetPackageName(domain), c.identifier)
 			for _, excel := range domain[ExcelTypeRegular] {
 				for _, node := range excel.Nodes() {
-					if node.Excel().ForServer() && node.Sheet().ForServer() {
+					if c.FilterNodeByDataType(node) {
 						formatter.FormatNode(node)
 					}
 				}
@@ -242,7 +135,7 @@ func (c *ConverterGo) FormatVarsLiteralData() {
 			if len(content) == 0 {
 				return nil
 			}
-			return []string{c.GetLiteralDataPath(domain), content}
+			return []string{r.GetLiteralDataPath(domain), content}
 		}
 	})
 	for _, result := range results {
@@ -255,7 +148,7 @@ func (c *ConverterGo) FormatVarsLiteralData() {
 	}
 }
 
-func (c *ConverterGo) FormatVarsJSONData() {
+func (r *RenderGo) FormatVarsJSONData(c *Converter) {
 	domains := make([]Domain, 0)
 	c.ForeachDomain(func(domain Domain) {
 		domains = append(domains, domain)
@@ -263,10 +156,10 @@ func (c *ConverterGo) FormatVarsJSONData() {
 	results := c.Parallel(ToSlice(domains), func(param any) func() any {
 		return func() any {
 			domain := param.(Domain)
-			formatter := NewFormatterGoVarsJSONData(c.GetPackageName(domain), c.identifier)
+			formatter := NewFormatterGoVarsJSONData(r.GetPackageName(domain), c.identifier)
 			for _, excel := range domain[ExcelTypeRegular] {
 				for _, node := range excel.Nodes() {
-					if node.Excel().ForServer() && node.Sheet().ForServer() {
+					if c.FilterNodeByDataType(node) {
 						formatter.FormatNode(node)
 					}
 				}
@@ -275,7 +168,7 @@ func (c *ConverterGo) FormatVarsJSONData() {
 			if len(content) == 0 {
 				return nil
 			}
-			return []string{c.GetJSONDataPath(domain), content}
+			return []string{r.GetJSONDataPath(domain), content}
 		}
 	})
 	for _, result := range results {
@@ -288,7 +181,7 @@ func (c *ConverterGo) FormatVarsJSONData() {
 	}
 }
 
-func (c *ConverterGo) FormatVars() {
+func (r *RenderGo) FormatVars(c *Converter) {
 	packageNames := make([]string, 0)
 	for packageName := range c.excelMap {
 		packageNames = append(packageNames, packageName)
@@ -301,7 +194,7 @@ func (c *ConverterGo) FormatVars() {
 			for _, domain := range c.excelMap[packageName] {
 				for _, excel := range domain[ExcelTypeRegular] {
 					for _, node := range excel.Nodes() {
-						if node.Excel().ForServer() && node.Sheet().ForServer() {
+						if c.FilterNodeByDataType(node) {
 							nodes = append(nodes, node)
 						}
 					}
@@ -317,7 +210,7 @@ func (c *ConverterGo) FormatVars() {
 			if len(content) == 0 {
 				return nil
 			}
-			return []string{c.GetVarPath(packageName), content}
+			return []string{r.GetVarPath(c, packageName), content}
 		}
 	})
 	for _, result := range results {
@@ -330,7 +223,7 @@ func (c *ConverterGo) FormatVars() {
 	}
 }
 
-func (c *ConverterGo) GetLiteralDataPath(domain Domain) string {
+func (r *RenderGo) GetLiteralDataPath(domain Domain) string {
 	for _, excels := range domain {
 		for _, excel := range excels {
 			goPackageName := format.ToGoPackageCase(excel.PackageName())
@@ -342,7 +235,7 @@ func (c *ConverterGo) GetLiteralDataPath(domain Domain) string {
 	return ""
 }
 
-func (c *ConverterGo) GetJSONDataPath(domain Domain) string {
+func (r *RenderGo) GetJSONDataPath(domain Domain) string {
 	for _, excels := range domain {
 		for _, excel := range excels {
 			goPackageName := format.ToGoPackageCase(excel.PackageName())
@@ -354,7 +247,7 @@ func (c *ConverterGo) GetJSONDataPath(domain Domain) string {
 	return ""
 }
 
-func (c *ConverterGo) GetVarPath(packageName string) string {
+func (r *RenderGo) GetVarPath(c *Converter, packageName string) string {
 	for _, domain := range c.excelMap[packageName] {
 		for _, excels := range domain {
 			for _, excel := range excels {
@@ -368,7 +261,7 @@ func (c *ConverterGo) GetVarPath(packageName string) string {
 	return ""
 }
 
-func (c *ConverterGo) GetPackageName(domain Domain) string {
+func (r *RenderGo) GetPackageName(domain Domain) string {
 	for _, excels := range domain {
 		for _, excel := range excels {
 			return format.ToGoPackageCase(excel.PackageName())
