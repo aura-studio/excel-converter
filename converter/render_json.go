@@ -23,7 +23,7 @@ func (r *RenderJson) Render() {
 			for excelIdx, excel := range domain[ExcelTypeRegular] {
 				nodes := make([]Node, 0)
 				for _, node := range excel.Nodes() {
-					if node.Excel().ForClient() && node.Sheet().ForClient() {
+					if c.FilterNodeByDataType(node) {
 						nodes = append(nodes, node)
 					}
 				}

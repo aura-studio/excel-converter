@@ -22,7 +22,7 @@ func (r *RenderLua) Render() {
 			formatter := NewFormatterLua()
 			for _, excel := range domain[ExcelTypeRegular] {
 				for _, node := range excel.Nodes() {
-					if node.Excel().ForClient() && node.Sheet().ForClient() {
+					if c.FilterNodeByDataType(node) {
 						formatter.FormatNode(node)
 					}
 				}
