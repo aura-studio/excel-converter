@@ -13,12 +13,14 @@ var (
 	FlagComma      = ","
 	FlagDash       = "-"
 	FlagSlash      = "/"
-	FlagSettings   = "__Settings"
-	FlagTemplate   = "__Template"
-	FlagDefault    = "__Default"
-	FlagBase       = "__Base"
-	FlagCategory   = "__Category"
-	FlagVarian     = "__Varian"
-	FlagLink       = "__Link"
-	FlagTimeZone   = "0"
+
+	// revised flags
+	FlagSettings = "Settings"
+	FlagTemplate = "Template"
+	FlagDefault  = "Default"
+	FlagBase     = "Base"
+	FlagCategory = "Category"
+	FlagVarian   = "Lucky"
+	FlagLink     = "Link"
+	FlagTimeZone = "0"
 )

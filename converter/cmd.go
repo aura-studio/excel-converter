@@ -109,11 +109,4 @@ func init() {
 	rootCmd.Flags().StringP("import", "i", "", "import path of excel files")
 	rootCmd.Flags().StringP("export", "e", "", "export path of generated files")
 	rootCmd.Flags().StringP("project", "p", "", "project path of generated files (required for go)")
-
-	// 标记必需的 flags
-	rootCmd.MarkFlagRequired("render")
-	rootCmd.MarkFlagRequired("data")
-	rootCmd.MarkFlagRequired("import")
-	rootCmd.MarkFlagRequired("export")
-	rootCmd.MarkFlagRequired("project")
 }
