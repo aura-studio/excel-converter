@@ -1,8 +1,9 @@
 package converter
 
-type DataType string
+type DataType = string
 
 const (
-	DataTypeServer DataType = "server"
-	DataTypeClient DataType = "client"
+	DataTypeServer  DataType = "server"
+	DataTypeClient  DataType = "client"
+	DataTypeComment DataType = "comment"
 )

@@ -4,7 +4,7 @@ type Render interface {
 	Render(*Converter)
 }
 
-type RenderType string
+type RenderType = string
 
 const (
 	RenderTypeGo     RenderType = "go"

@@ -17,18 +17,16 @@ type Domain map[ExcelType][]Excel
 type Task func() any
 
 type Converter struct {
-	renderType RenderType
-	dataType   DataType
 	excelMap   map[string]map[string]Domain
 	contentMap map[string]string
 	identifier *Identifier
 	collection *Collection
 }
 
-func NewConverter(renderType RenderType, dataType DataType) *Converter {
+var converter = NewConverter()
+
+func NewConverter() *Converter {
 	return &Converter{
-		renderType: renderType,
-		dataType:   dataType,
 		excelMap:   make(map[string]map[string]Domain),
 		contentMap: make(map[string]string),
 		identifier: NewIdentifier(),
@@ -47,10 +45,10 @@ func (c *Converter) Run() {
 }
 
 func (c *Converter) Render() {
-	if renderMap, ok := renderMap[c.renderType]; ok {
+	if renderMap, ok := renderMap[env.RenderType]; ok {
 		renderMap.Render(c)
 	} else {
-		Exit(fmt.Errorf("render type %s not found", c.renderType))
+		Exit(fmt.Errorf("render type %s not found", env.RenderType))
 	}
 }
 
@@ -340,13 +338,13 @@ func (c *Converter) Identity() {
 }
 
 func (c *Converter) FilterNodeByDataType(node Node) bool {
-	switch c.dataType {
+	switch env.DataType {
 	case DataTypeServer:
 		return node.Excel().ForServer() && node.Sheet().ForServer()
 	case DataTypeClient:
 		return node.Excel().ForClient() && node.Sheet().ForClient()
 	default:
-		Exit(fmt.Errorf("filter node by data type get invalid data type %s", c.dataType))
+		Exit(fmt.Errorf("filter node by data type get invalid data type %s", env.DataType))
 	}
 
 	return false
@@ -356,7 +354,7 @@ func (c *Converter) Link() {
 	c.ForeachExcel(func(e Excel) {
 		if e.Type() == ExcelTypeRegular {
 			for _, node := range e.Nodes() {
-				if node.Excel().ForServer() && node.Sheet().ForServer() {
+				if c.FilterNodeByDataType(node) {
 					c.collection.ReadNode(node)
 				}
 			}

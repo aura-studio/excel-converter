@@ -2,14 +2,6 @@ package converter
 
 import "strings"
 
-type FieldType string
-
-const (
-	FieldTypeServer  FieldType = "Server"
-	FieldTypeClient  FieldType = "Client"
-	FieldTypeComment FieldType = "Comment"
-)
-
 type HeaderField struct {
 	Index int
 	Name  string
@@ -18,13 +10,13 @@ type HeaderField struct {
 
 type SectionHeader struct {
 	*SectionBase
-	fieldMap map[FieldType][]int
+	fieldMap map[DataType][]int
 }
 
 func NewSectionHeader(sheet Sheet) *SectionHeader {
 	return &SectionHeader{
 		SectionBase: NewSectionBase(sheet),
-		fieldMap:    make(map[FieldType][]int),
+		fieldMap:    make(map[DataType][]int),
 	}
 }
 
@@ -55,7 +47,7 @@ func (s *SectionHeader) CheckSize() {
 }
 
 func (s *SectionHeader) HeaderSize() int {
-	return len(s.fieldMap[s.currentFieldType])
+	return len(s.fieldMap[DataType(env.DataType)])
 }
 
 func (s *SectionHeader) OriginHeadeSize() int {
@@ -69,7 +61,7 @@ func (s *SectionHeader) GetHeaderField(key any) HeaderField {
 		if index >= len(s.data[0]) {
 			Exit("[%v] Index is over header size", s.sheet)
 		}
-		rawIndex := s.fieldMap[s.currentFieldType][index]
+		rawIndex := s.fieldMap[env.DataType][index]
 		if len(s.data) == 2 {
 			return HeaderField{index, format.ToUpper(s.data[0][rawIndex]), s.data[1][rawIndex]}
 		} else {
@@ -78,7 +70,7 @@ func (s *SectionHeader) GetHeaderField(key any) HeaderField {
 	case string:
 		for index, name := range s.data[0] {
 			if key == format.ToUpper(name) {
-				rawIndex := s.fieldMap[s.currentFieldType][index]
+				rawIndex := s.fieldMap[env.DataType][index]
 				if len(s.data) == 2 {
 					return HeaderField{index, format.ToUpper(s.data[0][rawIndex]), s.data[1][rawIndex]}
 				} else {
@@ -100,18 +92,18 @@ func (s *SectionHeader) ParseFields() {
 	for index := 0; index < len(s.data[0]); index++ {
 		switch {
 		case strings.HasPrefix(s.data[0][index], FlagComment):
-			s.fieldMap[FieldTypeComment] = append(s.fieldMap[FieldTypeComment], index)
+			s.fieldMap[DataTypeComment] = append(s.fieldMap[DataTypeComment], index)
 		case strings.HasPrefix(s.data[0][index], FlagServer):
-			s.fieldMap[FieldTypeServer] = append(s.fieldMap[FieldTypeServer], index)
+			s.fieldMap[DataTypeServer] = append(s.fieldMap[DataTypeServer], index)
 		case strings.HasPrefix(s.data[0][index], FlagClient):
-			s.fieldMap[FieldTypeClient] = append(s.fieldMap[FieldTypeClient], index)
+			s.fieldMap[DataTypeClient] = append(s.fieldMap[DataTypeClient], index)
 		default:
-			s.fieldMap[FieldTypeServer] = append(s.fieldMap[FieldTypeServer], index)
-			s.fieldMap[FieldTypeClient] = append(s.fieldMap[FieldTypeClient], index)
+			s.fieldMap[DataTypeServer] = append(s.fieldMap[DataTypeServer], index)
+			s.fieldMap[DataTypeClient] = append(s.fieldMap[DataTypeClient], index)
 		}
 	}
 }
 
 func (s *SectionHeader) FieldIndexes() []int {
-	return s.fieldMap[s.currentFieldType]
+	return s.fieldMap[env.DataType]
 }

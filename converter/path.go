@@ -24,6 +24,11 @@ type RootPath struct {
 
 var path = NewRootPath()
 
+// InitPath 初始化全局 path 变量 - 公共接口
+func InitPath(relImportPath, relExportPath, relProjectPath string) {
+	path.Init(relImportPath, relExportPath, relProjectPath)
+}
+
 func NewRootPath() *RootPath {
 	return &RootPath{}
 }
