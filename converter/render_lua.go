@@ -11,7 +11,7 @@ func NewRenderLua() *RenderLua {
 	return &RenderLua{}
 }
 
-func (r *RenderLua) Render(c *Converter) {
+func (r *RenderLua) Render() {
 	domains := make([]Domain, 0)
 	c.ForeachDomain(func(domain Domain) {
 		domains = append(domains, domain)

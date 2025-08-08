@@ -10,11 +10,11 @@ func NewRenderCSharp() *RenderCSharp {
 	return &RenderCSharp{}
 }
 
-func (r *RenderCSharp) Render(c *Converter) {
-	r.FormatStructs(c)
+func (r *RenderCSharp) Render() {
+	r.FormatStructs()
 }
 
-func (r *RenderCSharp) FormatStructs(c *Converter) {
+func (r *RenderCSharp) FormatStructs() {
 	formatter := NewFormatterCSharpStructs(c.identifier)
 	formatter.FormatStruct()
 	formatter.FormatStructEqual()
@@ -22,3 +22,5 @@ func (r *RenderCSharp) FormatStructs(c *Converter) {
 	filePath := filepath.Join(path.ExportAbsPath(), "Structs.cs")
 	c.contentMap[filePath] = content
 }
+
+// func (r *RenderCSharp) FormatJsonData(c *Con

@@ -12,20 +12,20 @@ func NewRenderGo() *RenderGo {
 	return &RenderGo{}
 }
 
-func (r *RenderGo) Render(c *Converter) {
-	r.FormatVarsLiteralData(c)
-	r.FormatVarsJSONData(c)
-	r.FormatVars(c)
-	r.FormatStructs(c)
-	r.FormatStorageTypes(c)
-	r.FormatStorageVars(c)
-	r.FormatStorageStorages(c)
-	r.FormatStorageLinks(c)
-	r.FormatStorageCategories(c)
-	r.FormatStorage(c)
+func (r *RenderGo) Render() {
+	r.FormatVarsLiteralData()
+	r.FormatVarsJSONData()
+	r.FormatVars()
+	r.FormatStructs()
+	r.FormatStorageTypes()
+	r.FormatStorageVars()
+	r.FormatStorageStorages()
+	r.FormatStorageLinks()
+	r.FormatStorageCategories()
+	r.FormatStorage()
 }
 
-func (r *RenderGo) FormatStructs(c *Converter) {
+func (r *RenderGo) FormatStructs() {
 	formatter := NewFormatterGoStructs(c.identifier)
 	formatter.FormatStruct()
 	formatter.FormatStructEqual()
@@ -34,7 +34,7 @@ func (r *RenderGo) FormatStructs(c *Converter) {
 	c.contentMap[filePath] = content
 }
 
-func (r *RenderGo) FormatStorageVars(c *Converter) {
+func (r *RenderGo) FormatStorageVars() {
 	formatter := NewFormatterGoStorageDynamics()
 	formatter.FormatPackages()
 	formatter.FormatVars()
@@ -45,7 +45,7 @@ func (r *RenderGo) FormatStorageVars(c *Converter) {
 	c.contentMap[filePath] = content
 }
 
-func (r *RenderGo) FormatStorageStorages(c *Converter) {
+func (r *RenderGo) FormatStorageStorages() {
 	formatter := NewFormatterGoStorageStatics(c.collection.PackageNames(), c.collection.Storages())
 	formatter.FormatPackages()
 	formatter.FormatVars()
@@ -56,7 +56,7 @@ func (r *RenderGo) FormatStorageStorages(c *Converter) {
 	c.contentMap[filePath] = content
 }
 
-func (r *RenderGo) FormatStorageLinks(c *Converter) {
+func (r *RenderGo) FormatStorageLinks() {
 	formatter := NewFormatterGoStorageLinks(c.collection.Links())
 	formatter.FormatPackages()
 	formatter.FormatVars()
@@ -67,7 +67,7 @@ func (r *RenderGo) FormatStorageLinks(c *Converter) {
 	c.contentMap[filePath] = content
 }
 
-func (r *RenderGo) FormatStorageCategories(c *Converter) {
+func (r *RenderGo) FormatStorageCategories() {
 	formatter := NewFormatterGoStorageCategories(c.collection.Categories())
 	formatter.FormatPackages()
 	formatter.FormatFuncs()
@@ -77,7 +77,7 @@ func (r *RenderGo) FormatStorageCategories(c *Converter) {
 	c.contentMap[filePath] = content
 }
 
-func (r *RenderGo) FormatStorage(c *Converter) {
+func (r *RenderGo) FormatStorage() {
 	formatter := NewFormatterGoStorage()
 	formatter.FormatPackages()
 	formatter.FormatVars()
@@ -88,7 +88,7 @@ func (r *RenderGo) FormatStorage(c *Converter) {
 	c.contentMap[filePath] = content
 }
 
-func (r *RenderGo) FormatStorageTypes(c *Converter) {
+func (r *RenderGo) FormatStorageTypes() {
 	formatter := NewFormatterGoStorageTypes(c.identifier)
 	formatter.FormatPackages()
 	formatter.FormatTypes()
@@ -115,7 +115,7 @@ func (r *RenderGo) FormatStorageTypes(c *Converter) {
 	c.contentMap[filePath] = content
 }
 
-func (r *RenderGo) FormatVarsLiteralData(c *Converter) {
+func (r *RenderGo) FormatVarsLiteralData() {
 	domains := make([]Domain, 0)
 	c.ForeachDomain(func(domain Domain) {
 		domains = append(domains, domain)
@@ -148,7 +148,7 @@ func (r *RenderGo) FormatVarsLiteralData(c *Converter) {
 	}
 }
 
-func (r *RenderGo) FormatVarsJSONData(c *Converter) {
+func (r *RenderGo) FormatVarsJSONData() {
 	domains := make([]Domain, 0)
 	c.ForeachDomain(func(domain Domain) {
 		domains = append(domains, domain)
@@ -181,7 +181,7 @@ func (r *RenderGo) FormatVarsJSONData(c *Converter) {
 	}
 }
 
-func (r *RenderGo) FormatVars(c *Converter) {
+func (r *RenderGo) FormatVars() {
 	packageNames := make([]string, 0)
 	for packageName := range c.excelMap {
 		packageNames = append(packageNames, packageName)

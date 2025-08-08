@@ -1,7 +1,7 @@
 package converter
 
 type Render interface {
-	Render(*Converter)
+	Render()
 }
 
 type RenderType = string

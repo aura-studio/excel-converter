@@ -11,7 +11,7 @@ func NewRenderJson() *RenderJson {
 	return &RenderJson{}
 }
 
-func (r *RenderJson) Render(c *Converter) {
+func (r *RenderJson) Render() {
 	domains := make([]Domain, 0)
 	c.ForeachDomain(func(domain Domain) {
 		domains = append(domains, domain)

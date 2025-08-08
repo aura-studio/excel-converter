@@ -23,7 +23,7 @@ type Converter struct {
 	collection *Collection
 }
 
-var converter = NewConverter()
+var c = NewConverter()
 
 func NewConverter() *Converter {
 	return &Converter{
@@ -45,8 +45,8 @@ func (c *Converter) Run() {
 }
 
 func (c *Converter) Render() {
-	if renderMap, ok := renderMap[env.RenderType]; ok {
-		renderMap.Render(c)
+	if render, ok := renderMap[env.RenderType]; ok {
+		render.Render()
 	} else {
 		Exit(fmt.Errorf("render type %s not found", env.RenderType))
 	}

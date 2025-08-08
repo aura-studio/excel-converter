@@ -89,7 +89,7 @@ Usage examples:
 
 		env.Init(renderType, dataType)
 		path.Init(importPath, exportPath, projectPath)
-		converter.Run()
+		c.Run()
 	},
 }
 
