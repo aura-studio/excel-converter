@@ -76,28 +76,6 @@ func (f *FormatterCSharpStructs) Close() string {
 	return f.String()
 }
 
-// 判断是否为由导出结构定义的自定义结构体名
-func (f *FormatterCSharpStructs) isCustomStruct(name string) bool {
-	if name == "" {
-		return false
-	}
-	// 来自节点的结构体名
-	for _, n := range f.identifier.NodeStructMap {
-		if n == name {
-			return true
-		}
-	}
-	// 等价结构体名（别名）
-	for _, pair := range f.identifier.StructEquals {
-		for _, n := range pair {
-			if n == name {
-				return true
-			}
-		}
-	}
-	return false
-}
-
 func (f *FormatterCSharpStructs) Translate(goType string) string {
 	// 处理指针类型
 	if strings.HasPrefix(goType, "*") {
@@ -153,9 +131,6 @@ func (f *FormatterCSharpStructs) Translate(goType string) string {
 		return "DateTime"
 	default:
 		// 自定义结构体类型使用带前缀的类名，其它类型保持不变
-		if f.isCustomStruct(goType) {
-			return "C_" + goType
-		}
-		return goType
+		return "C_" + goType
 	}
 }
