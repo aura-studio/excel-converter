@@ -31,6 +31,8 @@ func (f *FormatterCSharpStructs) FormatStruct() {
 	for _, node := range f.identifier.OriginNodes {
 		f.WriteString("    [Serializable]\n")
 		f.WriteString("    public class ")
+		// Add prefix to avoid conflict with field names
+		f.WriteString("C_")
 		f.WriteString(f.identifier.NodeStructMap[node.ID()])
 		f.WriteString("\n    {\n")
 		for _, childNode := range node.Nodes() {
@@ -57,8 +59,10 @@ func (f *FormatterCSharpStructs) FormatStructEqual() {
 		f.WriteString("\n")
 		f.WriteString("    [Serializable]\n")
 		f.WriteString("    public class ")
+		f.WriteString("C_")
 		f.WriteString(structNames[0])
 		f.WriteString(" : ")
+		f.WriteString("C_")
 		f.WriteString(structNames[1])
 		f.WriteString("\n    {\n    }\n\n")
 	}
