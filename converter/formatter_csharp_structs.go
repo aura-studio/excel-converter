@@ -88,24 +88,21 @@ func (f *FormatterCSharpStructs) Translate(goType string) string {
 	// 处理映射类型
 	if strings.HasPrefix(goType, "map[") {
 		// 解析 map[keyType]valueType
-		mapContent := goType[4 : len(goType)-1] // 去掉 "map[" 和最后的 "]"
+		mapContent := goType[4:] // 去掉 "map[" 和最后的 "]"
 		// 找到键和值类型的分隔点
-		bracketCount := 0
 		splitIndex := -1
 		for i, char := range mapContent {
-			if char == '[' {
-				bracketCount++
-			} else if char == ']' {
-				bracketCount--
-				if bracketCount == 0 && i+1 < len(mapContent) {
-					splitIndex = i + 1
-					break
-				}
+			if char == ']' {
+				splitIndex = i
+				break
 			}
 		}
 		if splitIndex > 0 {
 			keyType := mapContent[:splitIndex]
-			valueType := mapContent[splitIndex:]
+			valueType := mapContent[splitIndex+2:]
+			if valueType[0] == '*' {
+				valueType = valueType[1:]
+			}
 			return "Dictionary<" + f.Translate(keyType) + ", " + f.Translate(valueType) + ">"
 		}
 	}
