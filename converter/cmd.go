@@ -23,8 +23,15 @@ This application can convert Excel files to:
 - And more...
 
 Usage examples:
-  excel-converter go ./excels ./output ./project
-  excel-converter --type=go --import=./excels --export=./output --project=./project`,
+	# 位置参数: <render> <data> <import> <export> <project>
+	# render:   go | lua | json | csharp
+	# data:     server | client  (数据筛选，服务端/客户端)
+	# import:   Excel 输入目录
+	# export:   生成文件输出目录
+	# project:  Go 输出时所需项目路径
+
+	excel-converter go client ./excels ./output ./project
+	excel-converter --render=go --data=client --import=./excels --export=./output --project=./project`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// 从命令行 flags 获取参数
 		renderType, err := cmd.Flags().GetString("render")
@@ -69,6 +76,13 @@ Usage examples:
 		if renderType == "" {
 			log.Panic("render type is required")
 		}
+		// dataType 必须是 server 或 client
+		if dataType == "" {
+			log.Panic("data type is required (server, client)")
+		}
+		if dataType != string(DataTypeServer) && dataType != string(DataTypeClient) {
+			log.Panicf("invalid data type: %s (expected: server or client)", dataType)
+		}
 		if importPath == "" {
 			log.Panic("import path is required")
 		}
@@ -105,7 +119,7 @@ func Execute() {
 func init() {
 	// 定义 flags
 	rootCmd.Flags().StringP("render", "r", "", "type of converter (go, lua, json, csharp)")
-	rootCmd.Flags().StringP("data", "d", "server", "data type (server, client)")
+	rootCmd.Flags().StringP("data", "d", "", "data type for filtering exported content: server | client (required)")
 	rootCmd.Flags().StringP("import", "i", "", "import path of excel files")
 	rootCmd.Flags().StringP("export", "e", "", "export path of generated files")
 	rootCmd.Flags().StringP("project", "p", "", "project path of generated files (required for go)")
