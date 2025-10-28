@@ -43,7 +43,7 @@ func (f *FormatterCSharpJSON) FormatVarName(node Node) {
 
 func (f *FormatterCSharpJSON) FormatFieldName(node Node) {
 	f.WriteString("\"")
-	f.WriteString(format.ToLower(node.FieldName()))
+	f.WriteString(format.ToUpper(node.FieldName()))
 	f.WriteString("\"")
 }
 
@@ -100,7 +100,7 @@ func (f *FormatterCSharpJSON) FormatFieldBase(node Node, sources []Source) {
 	source := sources[0]
 	switch node.Field().Structure {
 	case StructureTypeString:
-		f.WriteString(format.ToUpper(strconv.Quote(source.Content())))
+		f.WriteString(strconv.Quote(source.Content()))
 	case StructureTypeInt, StructureTypeFloat:
 		f.WriteByte('"')
 		switch source.Content() {
