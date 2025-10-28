@@ -21,7 +21,7 @@ func (r *RenderCSharp) FormatStructs() {
 	formatter.FormatStruct()
 	formatter.FormatStructEqual()
 	content := formatter.Close()
-	filePath := filepath.Join(path.ExportAbsPath(), "Structs.cs")
+	filePath := filepath.Join(path.ExportAbsPath(), "Structs", "Structs.cs")
 	c.contentMap[filePath] = content
 }
 
@@ -67,7 +67,7 @@ func (r *RenderCSharp) GetFilePath(domain Domain) string {
 		for _, excel := range excels {
 			packageName := format.ToJsonPackageCase(excel.PackageName())
 			fileName := fmt.Sprintf("%s.json", excel.DomainName())
-			return filepath.Join(path.ExportAbsPath(), packageName, fileName)
+			return filepath.Join(path.ExportAbsPath(), "Json", packageName, fileName)
 		}
 	}
 	Exit("[Main] Cannot find excel in domain")
