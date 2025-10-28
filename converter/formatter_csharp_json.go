@@ -1,6 +1,8 @@
 package converter
 
-import "strconv"
+import (
+	"strconv"
+)
 
 type FormatterCSharpJSON struct {
 	*FormatterBase

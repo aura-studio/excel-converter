@@ -33,7 +33,7 @@ func (r *RenderCSharp) FormatJson() {
 	results := c.Parallel(ToSlice(domains), func(param any) func() any {
 		return func() any {
 			domain := param.(Domain)
-			formatter := NewFormatterJSON(r.GetPackageName(domain))
+			formatter := NewFormatterCSharpJSON(r.GetPackageName(domain))
 			for excelIdx, excel := range domain[ExcelTypeRegular] {
 				nodes := make([]Node, 0)
 				for _, node := range excel.Nodes() {
