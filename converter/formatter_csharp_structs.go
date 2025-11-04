@@ -116,9 +116,9 @@ func (f *FormatterCSharpStructs) Translate(goType string) string {
 	case "string":
 		return "string"
 	case "int64", "int", "int32":
-		return "int"
+		return "long"
 	case "float64", "float32":
-		return "float"
+		return "double"
 	case "bool":
 		return "bool"
 	case "big.Int":
