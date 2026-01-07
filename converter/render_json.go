@@ -20,17 +20,26 @@ func (r *RenderJson) Render() {
 		return func() any {
 			domain := param.(Domain)
 			formatter := NewFormatterJSON(r.GetPackageName(domain))
-			for excelIdx, excel := range domain[ExcelTypeRegular] {
+
+			excelNodes := make([][]Node, 0)
+			for _, excel := range domain[ExcelTypeRegular] {
 				nodes := make([]Node, 0)
 				for _, node := range excel.Nodes() {
 					if c.FilterNodeByDataType(node) {
 						nodes = append(nodes, node)
 					}
 				}
-				for i, node := range nodes {
-					formatter.FormatNode(node, excelIdx == len(domain[ExcelTypeRegular])-1 && i == len(nodes)-1)
+				if len(nodes) > 0 {
+					excelNodes = append(excelNodes, nodes)
 				}
 			}
+
+			for idx, nodes := range excelNodes {
+				for i, node := range nodes {
+					formatter.FormatNode(node, idx == len(excelNodes)-1 && i == len(nodes)-1)
+				}
+			}
+
 			content := formatter.Close()
 			if len(content) == 0 {
 				return nil
