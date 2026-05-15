@@ -86,6 +86,9 @@ func (p *RootPath) findRoot() string {
 }
 
 func (p *RootPath) Abs(relPath string) string {
+	if filepath.IsAbs(relPath) {
+		return filepath.Clean(relPath)
+	}
 	return filepath.Join(p.root, relPath)
 }
 

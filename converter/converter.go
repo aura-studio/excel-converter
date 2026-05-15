@@ -56,7 +56,7 @@ func (c *Converter) Parallel(
 	params []any,
 	generator func(any) func() any,
 ) (results []any) {
-	var tasks = make([]Task, 0, len(params))
+	tasks := make([]Task, 0, len(params))
 	for _, param := range params {
 		tasks = append(tasks, generator(param))
 	}
@@ -85,6 +85,7 @@ func (c *Converter) ForeachDomain(f func(Domain)) {
 		}
 	}
 }
+
 func (c *Converter) ForeachExcel(f func(Excel)) {
 	for _, packageName := range c.excelMap {
 		for _, domain := range packageName {
@@ -99,8 +100,84 @@ func (c *Converter) ForeachExcel(f func(Excel)) {
 
 func (c *Converter) Load() {
 	c.Scan()
+	c.ValidateBaseExcelCoverage()
 	c.Read()
 	c.Preprocess()
+}
+
+func (c *Converter) ValidateBaseExcelCoverage() {
+	basePackage, ok := c.excelMap[FlagBase]
+	if !ok {
+		Exit("[ValidateBaseExcelCoverage] package %s not found", FlagBase)
+	}
+
+	baseTables := make(map[string]struct{})
+	for _, domain := range basePackage {
+		for typ, excels := range domain {
+			if typ != ExcelTypeRegular && typ != ExcelTypeTemplate {
+				continue
+			}
+			for _, excel := range excels {
+				baseTables[excel.FixedName()] = struct{}{}
+			}
+		}
+	}
+
+	missingTables := make(map[string]map[string]struct{})
+	for packageName, pkg := range c.excelMap {
+		if packageName == FlagBase || packageName == FlagDefault {
+			continue
+		}
+		for _, domain := range pkg {
+			for typ, excels := range domain {
+				if typ != ExcelTypeRegular && typ != ExcelTypeTemplate {
+					continue
+				}
+				for _, excel := range excels {
+					tableName := excel.FixedName()
+					if _, exists := baseTables[tableName]; exists {
+						continue
+					}
+					if _, exists := missingTables[tableName]; !exists {
+						missingTables[tableName] = make(map[string]struct{})
+					}
+					missingTables[tableName][packageName] = struct{}{}
+				}
+			}
+		}
+	}
+
+	if len(missingTables) == 0 {
+		return
+	}
+
+	tableNames := make([]string, 0, len(missingTables))
+	for tableName := range missingTables {
+		tableNames = append(tableNames, tableName)
+	}
+	sort.Strings(tableNames)
+
+	var builder strings.Builder
+	builder.WriteString("\n")
+	builder.WriteString(strings.Repeat("=", 72))
+	builder.WriteString("\n")
+	builder.WriteString("VALIDATION FAILED: BASE TABLE COVERAGE\n")
+	builder.WriteString(strings.Repeat("=", 72))
+	builder.WriteString("\n")
+	builder.WriteString(fmt.Sprintf("Missing table count: %d\n\n", len(tableNames)))
+	for idx, tableName := range tableNames {
+		categories := make([]string, 0, len(missingTables[tableName]))
+		for category := range missingTables[tableName] {
+			categories = append(categories, category)
+		}
+		sort.Strings(categories)
+		builder.WriteString(fmt.Sprintf("%d) TABLE: %s\n", idx+1, tableName))
+		builder.WriteString(fmt.Sprintf("   Categories: %s\n\n", strings.Join(categories, ", ")))
+	}
+	builder.WriteString("Action required: add the tables above to Base, then rerun converter.\n")
+	builder.WriteString(strings.Repeat("=", 72))
+
+	Exit("[ValidateBaseExcelCoverage] %s", builder.String())
 }
 
 func (c *Converter) Scan() {
@@ -150,7 +227,7 @@ func (c *Converter) Scan() {
 	for packageName, pkgExcelMap := range c.excelMap {
 		for domain, domainExcelMap := range pkgExcelMap {
 			for typ, typeExcels := range domainExcelMap {
-				var buf = new(bytes.Buffer)
+				buf := new(bytes.Buffer)
 				buf.WriteString(`[`)
 				for index, excel := range typeExcels {
 					buf.WriteString(excel.IndirectName())
@@ -180,7 +257,7 @@ func (c *Converter) Read() {
 }
 
 func (c *Converter) Write() {
-	var absPaths = make([]any, 0, len(c.contentMap))
+	absPaths := make([]any, 0, len(c.contentMap))
 	for absPath := range c.contentMap {
 		absPaths = append(absPaths, absPath)
 	}
@@ -248,7 +325,6 @@ func (c *Converter) Preprocess() {
 }
 
 func (c *Converter) Parse() {
-
 }
 
 func (c *Converter) Build() {
