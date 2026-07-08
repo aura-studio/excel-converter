@@ -3,6 +3,7 @@ package converter
 import (
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type Path interface {
@@ -101,6 +102,13 @@ func (p *RootPath) Rel(path string) string {
 }
 
 func (p *RootPath) ImportPath() string {
+	// If relProjectPath looks like a Go module path (contains '/'), treat it as
+	// the module name and directly join with the export path to form the import path.
+	// e.g. "codeup.aliyun.com/org/name" + "internal/exported/excel2go"
+	//   -> "codeup.aliyun.com/org/name/internal/exported/excel2go"
+	if strings.Contains(filepath.ToSlash(p.relProjectPath), "/") {
+		return filepath.ToSlash(p.relProjectPath) + "/" + filepath.ToSlash(p.relExportPath)
+	}
 	relPath, err := filepath.Rel(p.ProjectAbsPath(), filepath.Join(p.Path(), path.relExportPath))
 	if err != nil {
 		Exit("[Main] Get import path error %v", err)

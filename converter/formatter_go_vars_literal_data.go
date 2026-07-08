@@ -2,6 +2,7 @@ package converter
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -92,7 +93,18 @@ func (f *FormatterGoVarsLiteralData) FormatBase(node Node, sources []Source) {
 		case "":
 			f.WriteString("0")
 		default:
-			f.WriteString(source.Content())
+			content := source.Content()
+			// Fix Mac Excel float precision issue: e.g. "1.9999999999999996" should be int 2
+			// Only applies to int fields where content looks like a near-integer float
+			if node.Field().Structure == StructureTypeInt {
+				if fv, err := strconv.ParseFloat(content, 64); err == nil {
+					rv := math.Round(fv)
+					if math.Abs(fv-rv) < 1e-6 && fv != rv {
+						content = strconv.FormatInt(int64(rv), 10)
+					}
+				}
+			}
+			f.WriteString(content)
 		}
 	case StructureTypeBool:
 		switch source.Content() {

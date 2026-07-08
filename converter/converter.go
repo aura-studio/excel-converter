@@ -100,7 +100,7 @@ func (c *Converter) ForeachExcel(f func(Excel)) {
 
 func (c *Converter) Load() {
 	c.Scan()
-	c.ValidateBaseExcelCoverage()
+	// ValidateBaseExcelCoverage removed: Base is no longer required to be a superset of all category tables
 	c.Read()
 	c.Preprocess()
 }
@@ -430,7 +430,7 @@ func (c *Converter) Link() {
 	c.ForeachExcel(func(e Excel) {
 		if e.Type() == ExcelTypeRegular {
 			for _, node := range e.Nodes() {
-				if c.FilterNodeByDataType(node) {
+				if c.FilterNodeByDataType(node) && !skipVectorDataNode(node) {
 					c.collection.ReadNode(node)
 				}
 			}

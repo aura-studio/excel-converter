@@ -62,6 +62,9 @@ func (f *FormatterGoLinks) FormatLoading() {
 func LoadLinks() {
 `)
 	for _, link := range f.links {
+		if skipVectorDataLinkPath(link.DstLinkPath) || skipVectorDataLinkPath(link.SrcLinkPath) {
+			continue
+		}
 		f.WriteString("\tLoadLink(\"")
 		f.WriteString(link.DstLinkPath.Category)
 		f.WriteString("\", \"")
