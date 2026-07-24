@@ -108,3 +108,10 @@ func TestFormatAllCellsAsTextRunsBeforeLimitedImport(t *testing.T) {
 		t.Fatalf("row outside import limit style = %d, want text style %d", thirdStyle, firstStyle)
 	}
 }
+
+func TestExcelReadWorkersAreMemoryBounded(t *testing.T) {
+	workers := excelReadWorkers()
+	if workers < 1 || workers > maxExcelReadWorkers {
+		t.Fatalf("excelReadWorkers() = %d, want between 1 and %d", workers, maxExcelReadWorkers)
+	}
+}

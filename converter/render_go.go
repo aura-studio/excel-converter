@@ -110,7 +110,7 @@ func (r *RenderGo) FormatStorageTypes() {
 	for _, domain := range c.excelMap[FlagBase] {
 		for _, excel := range domain[ExcelTypeRegular] {
 			for _, node := range excel.Nodes() {
-				if c.FilterNodeByDataType(node) && !skipVectorDataNode(node) {
+				if c.FilterNodeByDataType(node) {
 					nodes = append(nodes, node)
 				}
 			}
@@ -138,7 +138,7 @@ func (r *RenderGo) FormatVarsLiteralData() {
 			formatter := NewFormatterGoLiteralData(r.GetPackageName(domain), c.identifier)
 			for _, excel := range domain[ExcelTypeRegular] {
 				for _, node := range excel.Nodes() {
-					if c.FilterNodeByDataType(node) && !skipVectorDataNode(node) {
+					if c.FilterNodeByDataType(node) {
 						formatter.FormatNode(node)
 					}
 				}
@@ -171,7 +171,7 @@ func (r *RenderGo) FormatVarsJSONData() {
 			formatter := NewFormatterGoVarsJSONData(r.GetPackageName(domain), c.identifier)
 			for _, excel := range domain[ExcelTypeRegular] {
 				for _, node := range excel.Nodes() {
-					if c.FilterNodeByDataType(node) && !skipVectorDataNode(node) {
+					if c.FilterNodeByDataType(node) {
 						formatter.FormatNode(node)
 					}
 				}
@@ -206,7 +206,7 @@ func (r *RenderGo) FormatVars() {
 			for _, domain := range c.excelMap[packageName] {
 				for _, excel := range domain[ExcelTypeRegular] {
 					for _, node := range excel.Nodes() {
-						if c.FilterNodeByDataType(node) && !skipVectorDataNode(node) {
+						if c.FilterNodeByDataType(node) {
 							nodes = append(nodes, node)
 						}
 					}

@@ -17,8 +17,9 @@ type Domain map[ExcelType][]Excel
 type Task func() any
 
 const (
-	maxExcelReadWorkers  = 1024
+	maxExcelReadWorkers  = 16
 	maxFileWriteWorkers  = 256
+	excelReadWorkerScale = 2
 	fileWriteWorkerScale = 16
 )
 
@@ -285,7 +286,7 @@ func (c *Converter) Read() {
 }
 
 func excelReadWorkers() int {
-	workers := runtime.NumCPU() * 128
+	workers := runtime.NumCPU() * excelReadWorkerScale
 	if workers > maxExcelReadWorkers {
 		workers = maxExcelReadWorkers
 	}
@@ -505,7 +506,7 @@ func (c *Converter) Link() {
 	c.ForeachExcel(func(e Excel) {
 		if e.Type() == ExcelTypeRegular {
 			for _, node := range e.Nodes() {
-				if c.FilterNodeByDataType(node) && !skipVectorDataNode(node) {
+				if c.FilterNodeByDataType(node) {
 					c.collection.ReadNode(node)
 				}
 			}

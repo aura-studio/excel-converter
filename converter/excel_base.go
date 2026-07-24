@@ -58,6 +58,12 @@ func (e *ExcelBase) ReadFileRows(maxRows int) map[string][][]string {
 	if err != nil {
 		Exit("[%v] Read %v error, %v", e, e, err)
 	}
+	defer func() {
+		// All generated sheets and nodes retain only the extracted row data.
+		// Drop the parsed workbook promptly so a full-repository conversion
+		// doesn't retain thousands of excelize workbooks until process exit.
+		e.file = nil
+	}()
 	if err := e.formatAllCellsAsText(); err != nil {
 		Exit("[%v] Format cells as text error, %v", e, err)
 	}

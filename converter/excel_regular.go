@@ -7,7 +7,6 @@ import (
 )
 
 const (
-	vectorExcelMaxRows     = 16
 	schemaOnlyExcelMaxRows = 2
 )
 
@@ -39,9 +38,6 @@ func (e *ExcelRegular) Read() {
 func excelReadMaxRows(excelName string) int {
 	if isVectorEgUseExcel(excelName) {
 		return schemaOnlyExcelMaxRows
-	}
-	if skipVectorDataExcelPath(excelName) {
-		return vectorExcelMaxRows
 	}
 	return 0
 }
