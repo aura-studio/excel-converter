@@ -2,6 +2,7 @@ package converter
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"sort"
 )
@@ -14,7 +15,9 @@ func NewRenderGo() *RenderGo {
 
 func (r *RenderGo) Render() {
 	r.FormatVarsLiteralData()
-	r.FormatVarsJSONData()
+	if includeGoDebugData() {
+		r.FormatVarsJSONData()
+	}
 	r.FormatVars()
 	r.FormatStructs()
 	r.FormatStorageTypes()
@@ -23,6 +26,15 @@ func (r *RenderGo) Render() {
 	r.FormatStorageLinks()
 	r.FormatStorageCategories()
 	r.FormatStorage()
+}
+
+func includeGoDebugData() bool {
+	switch os.Getenv("EXCEL_CONVERTER_GO_DEBUG_DATA") {
+	case "1", "true", "TRUE", "yes", "YES", "on", "ON":
+		return true
+	default:
+		return false
+	}
 }
 
 func (r *RenderGo) FormatStructs() {

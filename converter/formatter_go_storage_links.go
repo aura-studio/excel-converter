@@ -26,6 +26,23 @@ func (f *FormatterGoLinks) FormatVars() {
 
 func (f *FormatterGoLinks) FormatFuncs() {
 	f.WriteString(`
+type LinkPath struct {
+	PackageName string
+	ExcelName   string
+	SheetName   string
+}
+
+var LinkPathMap = make(map[LinkPath]LinkPath)
+
+func ResolveLink(packageName, excelName, sheetName string) (string, string, string, bool) {
+	for candidate := packageName; candidate != ""; candidate = Parent(candidate) {
+		if src, ok := LinkPathMap[LinkPath{candidate, excelName, sheetName}]; ok {
+			return src.PackageName, src.ExcelName, src.SheetName, true
+		}
+	}
+	return packageName, excelName, sheetName, false
+}
+
 func LoadLink(dstPackageName, dstExcelName, dstSheetName, srcPackageName, srcExcelName, srcSheetName string) {
 	for {
 		if srcPackageName == "" {
@@ -44,6 +61,7 @@ func LoadLink(dstPackageName, dstExcelName, dstSheetName, srcPackageName, srcExc
 			continue
 		}
 		v := Storage[srcPackageName][srcExcelName][srcSheetName]
+		LinkPathMap[LinkPath{dstPackageName, dstExcelName, dstSheetName}] = LinkPath{srcPackageName, srcExcelName, srcSheetName}
 		if _, ok := Storage[dstPackageName]; !ok {
 			Storage[dstPackageName] = make(map[string]map[string]any)
 		}

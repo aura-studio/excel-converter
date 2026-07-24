@@ -16,9 +16,19 @@ func skipVectorDataExcelPath(excelPath string) bool {
 		return false
 	}
 	excelName := parts[len(parts)-1]
+	return isDDBBackedVectorExcel(excelName) && !isVectorEgUseExcel(excelName)
+}
+
+func isDDBBackedVectorExcel(excelName string) bool {
+	excelName = strings.TrimSuffix(excelName, ".xlsx")
 	return strings.Contains(excelName, "VectorEg")
 }
 
 func skipVectorDataLinkPath(linkPath LinkPath) bool {
 	return skipVectorDataExcelPath(linkPath.ExcelName)
+}
+
+func isVectorEgUseExcel(excelName string) bool {
+	excelName = strings.TrimSuffix(excelName, ".xlsx")
+	return strings.HasSuffix(excelName, "EgUse")
 }

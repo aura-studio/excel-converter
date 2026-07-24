@@ -3,10 +3,10 @@ package converter
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 	"sync"
@@ -16,11 +16,18 @@ type Domain map[ExcelType][]Excel
 
 type Task func() any
 
+const (
+	maxExcelReadWorkers  = 1024
+	maxFileWriteWorkers  = 256
+	fileWriteWorkerScale = 16
+)
+
 type Converter struct {
-	excelMap   map[string]map[string]Domain
-	contentMap map[string]string
-	identifier *Identifier
-	collection *Collection
+	excelMap      map[string]map[string]Domain
+	contentMap    map[string]string
+	identifier    *Identifier
+	collection    *Collection
+	writeDirCache sync.Map
 }
 
 var c = NewConverter()
@@ -56,23 +63,44 @@ func (c *Converter) Parallel(
 	params []any,
 	generator func(any) func() any,
 ) (results []any) {
+	return c.ParallelLimit(params, 0, generator)
+}
+
+func (c *Converter) ParallelLimit(
+	params []any,
+	limit int,
+	generator func(any) func() any,
+) (results []any) {
 	tasks := make([]Task, 0, len(params))
 	for _, param := range params {
 		tasks = append(tasks, generator(param))
 	}
 
+	if limit <= 0 || limit > len(tasks) {
+		limit = len(tasks)
+	}
+	if limit == 0 {
+		return nil
+	}
 	mu := sync.Mutex{}
 	wg := sync.WaitGroup{}
-	for _, task := range tasks {
+	taskCh := make(chan Task)
+	for i := 0; i < limit; i++ {
 		wg.Add(1)
-		go func(task Task) {
+		go func() {
 			defer wg.Done()
-			result := task()
-			mu.Lock()
-			defer mu.Unlock()
-			results = append(results, result)
-		}(task)
+			for task := range taskCh {
+				result := task()
+				mu.Lock()
+				results = append(results, result)
+				mu.Unlock()
+			}
+		}()
 	}
+	for _, task := range tasks {
+		taskCh <- task
+	}
+	close(taskCh)
 	wg.Wait()
 
 	return
@@ -247,7 +275,7 @@ func (c *Converter) Read() {
 	c.ForeachExcel(func(excel Excel) {
 		excels = append(excels, excel)
 	})
-	c.Parallel(ToSlice(excels), func(param any) func() any {
+	c.ParallelLimit(ToSlice(excels), excelReadWorkers(), func(param any) func() any {
 		return func() any {
 			excel := param.(Excel)
 			excel.Read()
@@ -256,12 +284,23 @@ func (c *Converter) Read() {
 	})
 }
 
+func excelReadWorkers() int {
+	workers := runtime.NumCPU() * 128
+	if workers > maxExcelReadWorkers {
+		workers = maxExcelReadWorkers
+	}
+	if workers < 1 {
+		workers = 1
+	}
+	return workers
+}
+
 func (c *Converter) Write() {
 	absPaths := make([]any, 0, len(c.contentMap))
 	for absPath := range c.contentMap {
 		absPaths = append(absPaths, absPath)
 	}
-	c.Parallel(absPaths, func(param any) func() any {
+	c.ParallelLimit(absPaths, fileWriteWorkers(), func(param any) func() any {
 		return func() any {
 			absPath := param.(string)
 			content := c.contentMap[absPath]
@@ -274,27 +313,30 @@ func (c *Converter) Write() {
 	})
 }
 
-func (c *Converter) WriteFile(absPath string, s string) error {
-	// if dir not exists, then create it
-	fileDir := filepath.Dir(absPath)
-	if err := os.MkdirAll(fileDir, os.ModePerm); err != nil {
-		Exit(fmt.Errorf("[%s], %v", absPath, err))
+func fileWriteWorkers() int {
+	workers := runtime.NumCPU() * fileWriteWorkerScale
+	if workers > maxFileWriteWorkers {
+		workers = maxFileWriteWorkers
 	}
-	// if already exists then remove it
-	if _, err := os.Stat(absPath); err == nil {
-		os.Remove(absPath)
+	if workers < 1 {
+		workers = 1
 	}
-	file, err := os.Create(absPath)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
+	return workers
+}
 
-	_, err = io.WriteString(file, s)
-	if err != nil {
-		return err
+func (c *Converter) WriteFile(absPath string, s string) error {
+	fileDir := filepath.Dir(absPath)
+	if _, ok := c.writeDirCache.Load(fileDir); !ok {
+		if err := os.MkdirAll(fileDir, os.ModePerm); err != nil {
+			Exit(fmt.Errorf("[%s], %v", absPath, err))
+		}
+		c.writeDirCache.Store(fileDir, struct{}{})
 	}
-	return file.Sync()
+	data := []byte(s)
+	if oldData, err := os.ReadFile(absPath); err == nil && bytes.Equal(oldData, data) {
+		return nil
+	}
+	return os.WriteFile(absPath, data, 0666)
 }
 
 func (c *Converter) ExcelType(path string) ExcelType {
@@ -344,14 +386,47 @@ func (c *Converter) Build() {
 }
 
 func (c *Converter) Remove() {
-	err := os.RemoveAll(path.ExportAbsPath())
-	if err != nil {
-		Exit("[Main] Remove error, %v", err)
-	}
-	err = os.Mkdir(path.ExportAbsPath(), os.ModePerm)
-	if err != nil {
+	exportPath := path.ExportAbsPath()
+	if err := os.MkdirAll(exportPath, os.ModePerm); err != nil {
 		Exit("[Main] Mkdir error, %v", err)
 	}
+
+	keep := make(map[string]struct{}, len(c.contentMap))
+	for absPath := range c.contentMap {
+		keep[filepath.Clean(absPath)] = struct{}{}
+	}
+
+	if err := filepath.WalkDir(exportPath, func(absPath string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			return nil
+		}
+		absPath = filepath.Clean(absPath)
+		if _, ok := keep[absPath]; ok {
+			return nil
+		}
+		if isGeneratedFile(absPath) {
+			return os.Remove(absPath)
+		}
+		return nil
+	}); err != nil {
+		Exit("[Main] Remove stale file error, %v", err)
+	}
+}
+
+func isGeneratedFile(absPath string) bool {
+	switch filepath.Ext(absPath) {
+	case ".go", ".json", ".lua", ".cs":
+	default:
+		return false
+	}
+	data, err := os.ReadFile(absPath)
+	if err != nil {
+		return false
+	}
+	return bytes.Contains(data, []byte("auto generate by excel-to-"))
 }
 
 func (c *Converter) Identity() {

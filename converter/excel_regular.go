@@ -6,6 +6,11 @@ import (
 	"strings"
 )
 
+const (
+	vectorExcelMaxRows     = 16
+	schemaOnlyExcelMaxRows = 2
+)
+
 type ExcelRegular struct {
 	*ExcelBase
 }
@@ -28,7 +33,21 @@ func (e *ExcelRegular) SheetType(sheetName string) SheetType {
 }
 
 func (e *ExcelRegular) Read() {
-	data := e.ReadFile()
+	e.read(excelReadMaxRows(e.Name()))
+}
+
+func excelReadMaxRows(excelName string) int {
+	if isVectorEgUseExcel(excelName) {
+		return schemaOnlyExcelMaxRows
+	}
+	if skipVectorDataExcelPath(excelName) {
+		return vectorExcelMaxRows
+	}
+	return 0
+}
+
+func (e *ExcelRegular) read(maxRows int) {
+	data := e.ReadFileRows(maxRows)
 	for sheetName, rows := range data {
 		sheetType := e.SheetType(sheetName)
 		if e.sheetMap[sheetType] == nil {

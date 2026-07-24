@@ -10,6 +10,10 @@ func NewExcelTemplate(path Path, relPath string) *ExcelTemplate {
 	}
 }
 
+func (e *ExcelTemplate) Read() {
+	e.read(0)
+}
+
 func (*ExcelTemplate) Type() ExcelType {
 	return ExcelTypeTemplate
 }
