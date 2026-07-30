@@ -1,5 +1,7 @@
 package converter
 
+import "strconv"
+
 type FormatterGoLinks struct {
 	*FormatterBase
 	links []*Link
@@ -78,6 +80,9 @@ func LoadLink(dstPackageName, dstExcelName, dstSheetName, srcPackageName, srcExc
 func (f *FormatterGoLinks) FormatLoading() {
 	f.WriteString(`
 func LoadLinks() {
+	// LinkPathMap 在此处整体重建而不是增量写入：LoadLinks 只在 init 里调用一次，
+	// 重建可以按 link 数量预分配，同时保证即使被重复调用也不会残留过期映射。
+	LinkPathMap = make(map[LinkPath]LinkPath, ` + strconv.Itoa(len(f.links)) + `)
 `)
 	for _, link := range f.links {
 		f.WriteString("\tLoadLink(\"")

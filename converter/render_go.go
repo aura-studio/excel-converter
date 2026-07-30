@@ -20,8 +20,6 @@ func (r *RenderGo) Render() {
 	}
 	r.FormatVars()
 	r.FormatStructs()
-	r.FormatStorageTypes()
-	r.FormatStorageVars()
 	r.FormatStorageStorages()
 	r.FormatStorageLinks()
 	r.FormatStorageCategories()
@@ -43,17 +41,6 @@ func (r *RenderGo) FormatStructs() {
 	formatter.FormatStructEqual()
 	content := formatter.Close()
 	filePath := filepath.Join(path.ExportAbsPath(), "structs", "structs.go")
-	c.contentMap[filePath] = content
-}
-
-func (r *RenderGo) FormatStorageVars() {
-	formatter := NewFormatterGoStorageDynamics()
-	formatter.FormatPackages()
-	formatter.FormatVars()
-	formatter.FormatFuncs()
-	formatter.FormatLoading()
-	content := formatter.Close()
-	filePath := filepath.Join(path.ExportAbsPath(), "storage", "dynamics.go")
 	c.contentMap[filePath] = content
 }
 
@@ -97,33 +84,6 @@ func (r *RenderGo) FormatStorage() {
 	formatter.FormatLoading()
 	content := formatter.Close()
 	filePath := filepath.Join(path.ExportAbsPath(), "storage", "storage.go")
-	c.contentMap[filePath] = content
-}
-
-func (r *RenderGo) FormatStorageTypes() {
-	formatter := NewFormatterGoStorageTypes(c.identifier)
-	formatter.FormatPackages()
-	formatter.FormatTypes()
-	formatter.FormatVars()
-	formatter.FormatFuncs()
-	var nodes = []Node{}
-	for _, domain := range c.excelMap[FlagBase] {
-		for _, excel := range domain[ExcelTypeRegular] {
-			for _, node := range excel.Nodes() {
-				if c.FilterNodeByDataType(node) {
-					nodes = append(nodes, node)
-				}
-			}
-		}
-	}
-	sort.Slice(nodes, func(i, j int) bool {
-		return nodes[i].String() < nodes[j].String()
-	})
-	for _, node := range nodes {
-		formatter.FormatNode(node)
-	}
-	content := formatter.Close()
-	filePath := filepath.Join(path.ExportAbsPath(), "storage", "types.go")
 	c.contentMap[filePath] = content
 }
 

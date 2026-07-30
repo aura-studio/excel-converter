@@ -18,16 +18,19 @@ func (f *FormatterGoStorage) FormatPackages() {
 	f.WriteString(`
 import (
 	"strings"
-
-	"github.com/mohae/deepcopy"
 )
 `)
 }
 
 func (f *FormatterGoStorage) FormatVars() {
 	f.WriteString(`
+// Storage 是最终生效的配置：已应用 link 与 category 解析。
+// 它在 init 阶段一次性构建完成，之后只读。
 var Storage = make(map[string]map[string]map[string]any)
-var OriginStorage = make(map[string]map[string]map[string]any)
+
+// originStorage 是 LoadStatics 直接写入的原始配置，未经 link / category 解析，
+// 仅作为构建 Storage 的中间产物，不对外暴露。
+var originStorage = make(map[string]map[string]map[string]any)
 `)
 }
 
@@ -45,40 +48,27 @@ func Parent(packageName string) string {
 	}
 }
 
-func ResetOriginStorage() {
-	storage := make(map[string]map[string]map[string]any)
-	for packageName, subStorage := range OriginStorage {
+// buildStorage 由 originStorage 重建三层 map 骨架，叶子（sheet）数据按引用共享。
+//
+// 配置表在运行期是只读的：需要修改表数据的调用方会自行深拷贝再改。
+// 因此这里不做 deepcopy，否则 Storage 与 originStorage 会各自持有
+// 一整套表数据，启动内存成倍放大。
+func buildStorage() map[string]map[string]map[string]any {
+	storage := make(map[string]map[string]map[string]any, len(originStorage))
+	for packageName, subStorage := range originStorage {
 		for excelName, excel := range subStorage {
 			for sheetName, sheet := range excel {
 				if _, ok := storage[packageName]; !ok {
-					storage[packageName] = make(map[string]map[string]any)
+					storage[packageName] = make(map[string]map[string]any, len(subStorage))
 				}
 				if _, ok := storage[packageName][excelName]; !ok {
-					storage[packageName][excelName] = make(map[string]any)
+					storage[packageName][excelName] = make(map[string]any, len(excel))
 				}
-				storage[packageName][excelName][sheetName] = deepcopy.Copy(sheet)
+				storage[packageName][excelName][sheetName] = sheet
 			}
 		}
 	}
-	OriginStorage = storage
-}
-
-func ResetStorage() {
-	storage := make(map[string]map[string]map[string]any)
-	for packageName, subStorage := range OriginStorage {
-		for excelName, excel := range subStorage {
-			for sheetName, sheet := range excel {
-				if _, ok := storage[packageName]; !ok {
-					storage[packageName] = make(map[string]map[string]any)
-				}
-				if _, ok := storage[packageName][excelName]; !ok {
-					storage[packageName][excelName] = make(map[string]any)
-				}
-				storage[packageName][excelName][sheetName] = deepcopy.Copy(sheet)
-			}
-		}
-	}
-	Storage = storage
+	return storage
 }
 `)
 }
@@ -86,20 +76,8 @@ func ResetStorage() {
 func (f *FormatterGoStorage) FormatLoading() {
 	f.WriteString(`
 func init() {
-	ResetOriginStorage()
 	LoadStatics()
-	ResetStorage()
-	LoadLinks()
-	LoadCategories()
-
-	// For dynamic
-	LoadTypes()
-}
-
-func Load(data map[string]string) {
-	ResetOriginStorage()
-	LoadDynamics(data)
-	ResetStorage()
+	Storage = buildStorage()
 	LoadLinks()
 	LoadCategories()
 }

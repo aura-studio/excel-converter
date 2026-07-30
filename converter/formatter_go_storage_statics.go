@@ -38,13 +38,13 @@ func (f *FormatterGoStorageStatics) FormatVars() {
 func (f *FormatterGoStorageStatics) FormatFuncs() {
 	f.WriteString(`
 func LoadStatic(packageName, excelName, sheetName string, v any) {
-	if _, ok := OriginStorage[packageName]; !ok {
-		OriginStorage[packageName] = make(map[string]map[string]any)
+	if _, ok := originStorage[packageName]; !ok {
+		originStorage[packageName] = make(map[string]map[string]any)
 	}
-	if _, ok := OriginStorage[packageName][excelName]; !ok {
-		OriginStorage[packageName][excelName] = make(map[string]any)
+	if _, ok := originStorage[packageName][excelName]; !ok {
+		originStorage[packageName][excelName] = make(map[string]any)
 	}
-	OriginStorage[packageName][excelName][sheetName] = v
+	originStorage[packageName][excelName][sheetName] = v
 }
 `)
 }
